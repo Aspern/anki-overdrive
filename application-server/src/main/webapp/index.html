@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>        
+        <!-- META SECTION -->
+        <title>ANKI Overdrive - Cars Controller</title>            
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        
+        <link rel="icon" href="" type="image/x-icon" />
+        <!-- END META SECTION -->
+        
+        <!-- CSS INCLUDE -->        
+        <link rel="stylesheet" type="text/css" id="theme" href="css/theme-default.css"/>
+        <!-- EOF CSS INCLUDE -->                                    
+    </head>
+    <body ng-app="app">
+        <!-- START PAGE CONTAINER -->
+            
+
+            
+            <!-- PAGE CONTENT -->
+            <div class="page-content" ng-controller="MyCtrl">
+                
+               
+                <!-- START BREADCRUMB -->
+                <ul class="breadcrumb">
+                    <li><img src="img/Msg_systems_Logo.svg.png" width="180px" height="60px" style="margin:10px;"></li>                   
+
+                </ul>
+                <!-- END BREADCRUMB -->  
+
+                
+                <!-- PAGE CONTENT WRAPPER -->
+                <div class="page-content-wrap">
+
+                  <!-- START WIDGETS -->                    
+                    <div class="row">
+                  
+                        <div class="col-md-3" data-ng-repeat="n in scenarioArray track by $index">
+                            
+                            <!-- START WIDGET REGISTRED -->
+                            <div class="widget widget-default widget-item-icon">
+                                <div class="widget-item-left">
+                                
+                                <label class="switch" style="margin-top: 10px;">
+                                    <input type="checkbox" ng-model="scenarioStatus[n]" ng-click="checkBoxClicked(scenarioStatus[n],$index)" />
+                                    <span></span>
+                                </label>     
+
+                                </div>
+                                <div class="widget-data">
+                                    <div class="widget-int num-count">0{{$index+1}}</div>
+                                    <div class="widget-title">{{n}}</div>
+                                    <div class="widget-subtitle">status: {{scenarioStatus[n] ? 'ON' : 'OFF'}}</div>
+                                </div>
+                                <div class="widget-controls">                                
+                                </div>                            
+                            </div>                            
+                            <!-- END WIDGET REGISTRED -->
+                            
+                        </div>
+
+                        <pre>{{scenarioStatus | json}}</pre>
+
+                        
+                        
+                    </div>
+                    <!-- END WIDGETS -->                  
+                    
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            
+                            <!-- START PROJECTS BLOCK -->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div class="panel-title-box">
+                                        <h3>Connect Cars</h3>
+                                        <span>Via Bluetooth</span>
+                                    </div>                                    
+                                    <ul class="panel-controls" style="margin-top: 2px;">
+                                        <li><a href="#" class="panel-fullscreen"><span class="fa fa-expand"></span></a></li>
+                                        <li><a href="#" class="panel-refresh"><span class="fa fa-refresh"></span></a></li>
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fa fa-cog"></span></a>                                        
+                                            <ul class="dropdown-menu">
+                                                <li><a href="#" class="panel-collapse"><span class="fa fa-angle-down"></span> Collapse</a></li>
+                                                <li><a href="#" class="panel-remove"><span class="fa fa-times"></span> Remove</a></li>
+                                            </ul>                                        
+                                        </li>                                        
+                                    </ul>
+                                </div>
+                                <div class="panel-body panel-body-table">
+                                    
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th width="30%">Car ID</th>
+                                                    <th width="25%">Car Name</th>
+                                                    <th width="20%">Status</th>
+                                                    <th width="25%">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody data-ng-repeat="car in api_getSetup">
+                                                <tr data-ng-repeat="val in car.vehicles">
+                                                    <td><strong>{{val.uuid}} - {{car.uuid}}</strong></td>
+                                                    <td><strong>{{val.name}}</strong></td>
+                                                    <td><span ng-class="val.connected ? 'label label-success' : 'label label-danger'">{{val.connected ? 'Connected' : 'Disconnected'}}</span></td>
+                                                    <td><button type="button" ng-click="sendWebSocketMessage(car.uuid,val.uuid,'connection',val.connected)" ng-class="val.connected ? 'btn btn-primary' : 'btn'">{{val.connected ? 'Disconnect' : 'Connect'}}</button></td>
+                                              </tr>
+                                                                            
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            <!-- END PROJECTS BLOCK -->
+                            
+                        </div>
+
+                         <div class="col-md-6">
+                            
+                            <!-- START VISITORS BLOCK -->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div class="panel-title-box">
+                                        <h3>Terminal</h3>
+                                        <span>Status from the system</span>
+                                    </div>
+                                    <ul class="panel-controls" style="margin-top: 2px;">
+                                        <li><a href="#" class="panel-fullscreen"><span class="fa fa-expand"></span></a></li>
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fa fa-cog"></span></a>                                        
+                                            <ul class="dropdown-menu">
+                                                <li><a href="#" class="panel-collapse"><span class="fa fa-angle-down"></span> Collapse</a></li>
+                                                <li><a href="#" class="panel-remove"><span class="fa fa-times"></span> Remove</a></li>
+                                            </ul>                                        
+                                        </li>                                        
+                                    </ul>
+                                </div>
+                                <div class="panel-body" style="max-height: 170px; height: 170px; overflow-y:scroll; margin-bottom: 10px;">
+                                <div style="margin-bottom: 5px;" id="terminal" >
+                                >> [Tue Apr 04 2017 01:50:16 GMT+0200 (CEST)] Preparing to Start Collision ...<br>
+                                >> [Tue Apr 04 2017 01:50:16 GMT+0200 (CEST)] System is not connected!  <br>
+                       
+                                </div>
+                                </div>
+                            </div>
+                            <!-- END VISITORS BLOCK -->
+                            
+                        </div>
+
+                         <!-- START BREADCRUMB -->
+                <ul class="breadcrumb">
+                    <li><h4><b>Cars Controller</b></h4></li>                   
+
+                </ul>
+                <!-- END BREADCRUMB -->  
+
+
+                <div class="col-md-4" ng-repeat = 'vehicle in allVehicles'>
+                            
+                            <!-- START VISITORS BLOCK -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="panel-title-box">
+                                <h3>{{vehicle.name}}</h3>
+                                <span>{{vehicle.uuid}}</span>
+                            </div>
+                        <ul class="panel-controls" style="margin-top: 2px;">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fa fa-cog"></span></a>                                        
+                                <ul class="dropdown-menu">
+                                    <li><a href="#" class="panel-collapse"><span class="fa fa-angle-down"></span> Collapse</a></li>
+                                    <li><a href="#" class="panel-remove"><span class="fa fa-times"></span> Remove</a></li>
+                                </ul>                                        
+                            </li>                                        
+                        </ul>
+                        
+                        </div>
+                        
+                        <div class="panel-body">
+                                
+                            <div style="float: right;"> <i style="margin-right: 2px;">100%</i> <meter value="0.6"></meter></div>
+
+                            <br>
+                            
+                            <div align="center" style="text-align: center;margin:0 auto;float-left:auto;float-right:auto;display: table;"><meter-gauge gaugeconfig="speedometer[vehicle.uuid]"></meter-gauge></div>
+
+                                <div align="center"><input type="range" min="0" max="1000" id="s{{vehicle.uuid}}" step="5" onchange="rangevalue1.value=value; angular.element(this).scope().sendWebSocketMessage(0,id,'changeSpeed',value);" style="width: 80%;text-align: center;" /></div>
+
+                                <div align="center"><output id="rangevalue1">{{speedometer[vehicle.uuid].needleVal}}</output></div>
+       
+                                    <div align="center" style="margin-top: 10px;">
+                                        <div class="btn-group" style="margin-bottom: 20px;">
+
+                                            <button class="btn btn-default newpadding" id="l1{{vehicle.uuid}}" onclick="angular.element(this).scope().sendWebSocketMessage(0,id,'changeLane','-68.0');"><i >Lane 1</i></button>
+                                            <button class="btn btn-default newpadding" id="l2{{vehicle.uuid}}" onclick="angular.element(this).scope().sendWebSocketMessage(0,id,'changeLane','-23.0');"><i >Lane 2</i></button>
+                                            <button class="btn btn-default newpadding" id="l3{{vehicle.uuid}}" onclick="angular.element(this).scope().sendWebSocketMessage(0,id,'changeLane','23.0');"><i >Lane 3</i></button>
+                                            <button class="btn btn-default newpadding" id="l4{{vehicle.uuid}}" onclick="angular.element(this).scope().sendWebSocketMessage(0,id,'changeLane','68.0');"><i >Lane 4</i></button>
+                                                                                                                                                                                        
+                                         </div>
+
+                                         <br>
+
+                                        <button type="button" class="btn btn-info btn-rounded" id="b{{vehicle.uuid}}" onclick="angular.element(this).scope().sendWebSocketMessage(0,id,'applyBrake','');" style="padding: 5px 40px;">Apply Brake</button>
+
+
+                                    </div>
+
+                                </div>
+                                <!-- PANEL BODY ENDS HERE -->
+                            </div>
+                            <!-- END VISITORS BLOCK -->
+                            
+                        </div>
+
+
+
+
+                            
+                        </div>
+
+
+  
+
+                         
+                    </div>
+
+
+
+                   
+                    
+                    <!-- START DASHBOARD CHART -->
+                    <div class="chart-holder" id="dashboard-area-1" style="height: 200px;"></div>
+                    <div class="block-full-width">
+                                                                       
+                    </div>                    
+                    <!-- END DASHBOARD CHART -->
+                    
+                </div>
+                <!-- END PAGE CONTENT WRAPPER -->                                
+            </div>            
+            <!-- END PAGE CONTENT -->
+        </div>
+        <!-- END PAGE CONTAINER -->
+
+        <!-- MESSAGE BOX-->
+        <div class="message-box animated fadeIn" data-sound="alert" id="mb-signout">
+            <div class="mb-container">
+                <div class="mb-middle">
+                    <div class="mb-title"><span class="fa fa-sign-out"></span> Log <strong>Out</strong> ?</div>
+                    <div class="mb-content">
+                        <p>Are you sure you want to log out?</p>                    
+                        <p>Press No if youwant to continue work. Press Yes to logout current user.</p>
+                    </div>
+                    <div class="mb-footer">
+                        <div class="pull-right">
+                            <a href="pages-login.html" class="btn btn-success btn-lg">Yes</a>
+                            <button class="btn btn-default btn-lg mb-control-close">No</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END MESSAGE BOX-->
+
+        <!-- START PRELOADS -->
+        <audio id="audio-alert" src="audio/alert.mp3" preload="auto"></audio>
+        <audio id="audio-fail" src="audio/fail.mp3" preload="auto"></audio>
+        <!-- END PRELOADS -->                  
+        
+    <!-- START SCRIPTS -->
+        <!-- START PLUGINS -->
+        <script type="text/javascript" src="js/plugins/jquery/jquery.min.js"></script>
+        <script type="text/javascript" src="js/plugins/jquery/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="js/plugins/bootstrap/bootstrap.min.js"></script>        
+        <!-- END PLUGINS -->
+
+        <!-- START THIS PAGE PLUGINS-->        
+        <script type='text/javascript' src='js/plugins/icheck/icheck.min.js'></script>        
+        <script type="text/javascript" src="js/plugins/mcustomscrollbar/jquery.mCustomScrollbar.min.js"></script>
+        <script type="text/javascript" src="js/plugins/scrolltotop/scrolltopcontrol.js"></script>
+        
+                 
+        <script type='text/javascript' src='js/plugins/bootstrap/bootstrap-datepicker.js'></script>                
+        <script type="text/javascript" src="js/plugins/owl/owl.carousel.min.js"></script>                 
+        
+        <script type="text/javascript" src="js/plugins/moment.min.js"></script>
+ 
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+        <script src="https://code.highcharts.com/highcharts.js"></script>
+        <script src="https://code.highcharts.com/highcharts-more.js"></script>
+        <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
+
+
+        <!-- END THIS PAGE PLUGINS-->        
+
+        <!-- START TEMPLATE -->
+        
+        <script type="text/javascript" src="js/plugins.js"></script>       
+        <script type="text/javascript" src="js/actions.js"></script>
+        <script type="text/javascript" src="js/plugins/angular-metergauge.min.js"></script> 
+        <script type="text/javascript" src="js/angular_main.js"></script>
+        <script type="text/javascript" src="js/plugins/ng-websocket/ng-websocket.js""></script>        
+        <script type="text/javascript" src="js/plugins/ng-resource/angular-resource.js"></script>
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+        <script src="js/service/restApi.js"></script>
+        
+        <!-- END TEMPLATE -->
+    <!-- END SCRIPTS -->         
+    </body>
+</html>

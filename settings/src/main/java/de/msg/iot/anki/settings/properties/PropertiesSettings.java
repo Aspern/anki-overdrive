@@ -15,7 +15,7 @@ public class PropertiesSettings implements Settings {
         this.properties = properties;
     }
 
-    PropertiesSettings(String resource) {
+    public PropertiesSettings(String resource) {
         this(new Properties());
 
         try (InputStream in = getClass()
