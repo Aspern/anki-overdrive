@@ -19,9 +19,9 @@ import java.util.List;
 public class SetupRestHandler {
 
 
-//    private static KafkaScenarioController scenarioController = new KafkaScenarioController();
+    //    private static KafkaScenarioController scenarioController = new KafkaScenarioController();
 //    private static Map<String, KafkaVehicleController> controller = new HashMap<>();
-    private static List<String> scenarios = new ArrayList<String>() {{
+    private static final List<String> scenarios = new ArrayList<String>() {{
         add("collision");
         add("anti-collision");
         add("max-speed");
@@ -35,7 +35,7 @@ public class SetupRestHandler {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response list() {
-        List<Setup> list = manager.createQuery("select d from Setup d")
+        @SuppressWarnings("unchecked") List<Setup> list = manager.createQuery("select d from Setup d")
                 .getResultList();
 
         return Response.ok(list).build();

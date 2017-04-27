@@ -14,13 +14,11 @@ import java.util.Properties;
 public abstract class AbstractKafkaConsumer<T> implements Runnable {
 
     private final KafkaConsumer<String, String> consumer;
-    private final String[] topics;
     private final Gson serializer = new Gson();
     private volatile boolean running = true;
 
-    public AbstractKafkaConsumer(String... topics) {
+    AbstractKafkaConsumer(String... topics) {
         final Settings settings = new PropertiesSettings("settings.properties");
-        this.topics = topics;
 
         Properties props = new Properties();
         props.put("bootstrap.servers", settings.get("kafka.server"));
@@ -51,9 +49,9 @@ public abstract class AbstractKafkaConsumer<T> implements Runnable {
         }
     }
 
-    public abstract Class<T> getType();
+    protected abstract Class<T> getType();
 
-    public abstract void handle(T record);
+    protected abstract void handle(T record);
 
     public void stop() {
         this.running = false;

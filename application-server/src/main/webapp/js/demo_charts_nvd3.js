@@ -20,9 +20,8 @@ var nvd3Charts = function() {
 			.showLegend(true)//Show the legend, allowing users to turn on/off line series.
 			.showYAxis(true)//Show the y-axis
 			.showXAxis(true)//Show the x-axis
-			.color(d3.scale.myColors().range());;
-
-			chart.xAxis//Chart x-axis settings
+                .color(d3.scale.myColors().range());
+            chart.xAxis//Chart x-axis settings
 			.axisLabel('Time (ms)').tickFormat(d3.format(',r'));
 
 			chart.yAxis//Chart y-axis settings
@@ -83,9 +82,8 @@ var nvd3Charts = function() {
 	var startChart2 = function() {
 		nv.addGraph(function() {
 			var chart = nv.models.scatterChart().showDistX(true)//showDist, when true, will display those little distribution lines on the axis.
-			.showDistY(true).transitionDuration(350).color(d3.scale.myColors().range());;
-
-			//Configure how the tooltip looks.
+                .showDistY(true).transitionDuration(350).color(d3.scale.myColors().range());
+            //Configure how the tooltip looks.
 			chart.tooltipContent(function(key) {
                             return '<h3>' + key + '</h3>';
 			});
@@ -146,8 +144,8 @@ var nvd3Charts = function() {
 					return d[0];
 				}).y(function(d) {
 					return d[1];
-				}).forceY([0, 8000]).useInteractiveGuideline(true).color(d3.scale.myColors().range());;
-				var options = {
+                }).forceY([0, 8000]).useInteractiveGuideline(true).color(d3.scale.myColors().range());
+                var options = {
 					showControls : false,
 					showLegend : true
 				};
@@ -176,9 +174,8 @@ var nvd3Charts = function() {
 			.tooltips(false)//Don't show tooltips
 			.showValues(true)//...instead, show the bar value right on top of each bar.
 			.transitionDuration(350)
-                        .color(d3.scale.myColors().range());;
-
-			d3.select('#chart-4 svg').datum(exampleData()).call(chart);
+                .color(d3.scale.myColors().range());
+            d3.select('#chart-4 svg').datum(exampleData()).call(chart);
 
 			nv.utils.windowResize(chart.update);
 
@@ -263,9 +260,8 @@ var nvd3Charts = function() {
 					return i;
 				}).y(function(d, i) {
 					return d[1];
-				}).color(d3.scale.myColors().range());;
-
-				chart.xAxis.tickFormat(function(d) {
+                    }).color(d3.scale.myColors().range());
+                chart.xAxis.tickFormat(function(d) {
 					var dx = data[0].values[d] && data[0].values[d][0] || 0;
 					return d3.time.format('%x')(new Date(dx));
 				});
@@ -316,9 +312,8 @@ var nvd3Charts = function() {
 	};
 	var startChart8 = function() {
 		nv.addGraph(function() {
-			var chart = nv.models.lineWithFocusChart().color(d3.scale.myColors().range());;
-
-			chart.xAxis.tickFormat(d3.format(',f'));
+            var chart = nv.models.lineWithFocusChart().color(d3.scale.myColors().range());
+            chart.xAxis.tickFormat(d3.format(',f'));
 
 			chart.yAxis.tickFormat(d3.format(',.2f'));
 
@@ -351,9 +346,8 @@ var nvd3Charts = function() {
 				return d.label;
 			}).y(function(d) {
 				return d.value;
-			}).showLabels(true).color(d3.scale.myColors().range());;
-
-			d3.select("#chart-9 svg").datum(exampleData()).transition().duration(350).call(chart);
+            }).showLabels(true).color(d3.scale.myColors().range());
+            d3.select("#chart-9 svg").datum(exampleData()).transition().duration(350).call(chart);
 
 			return chart;
 		});
@@ -369,9 +363,8 @@ var nvd3Charts = function() {
 			.labelType("percent")//Configure what type of data to show in the label. Can be "key", "value" or "percent"
 			.donut(true)//Turn on Donut mode. Makes pie chart look tasty!
 			.donutRatio(0.35)//Configure how big you want the donut hole size to be.
-			.color(d3.scale.myColors().range());;
-
-			d3.select("#chart-10 svg").datum(exampleData()).transition().duration(350).call(chart);
+                .color(d3.scale.myColors().range());
+            d3.select("#chart-10 svg").datum(exampleData()).transition().duration(350).call(chart);
 
 			return chart;
 		});

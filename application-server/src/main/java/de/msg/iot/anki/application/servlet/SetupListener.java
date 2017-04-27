@@ -1,10 +1,8 @@
 package de.msg.iot.anki.application.servlet;
 
-
 import de.msg.iot.anki.application.entity.Setup;
 import de.msg.iot.anki.application.kafka.SetupKafkaConsumer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
@@ -18,16 +16,17 @@ import java.util.concurrent.TimeUnit;
 public class SetupListener implements ServletContextListener {
 
     private final ExecutorService threadPool = Executors.newSingleThreadExecutor();
-    private final Logger logger = LogManager.getLogger(SetupListener.class);
+    private final Logger logger = Logger.getLogger(SetupListener.class);
     private final EntityManager manager = Persistence
             .createEntityManagerFactory("anki")
             .createEntityManager();
     private final SetupKafkaConsumer consumer = new SetupKafkaConsumer();
 
     @Override
+    @SuppressWarnings("unchecked")
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         logger.info("Starting consumer for AnkiOverdriveSetupListener...");
-        consumer.handle(setup -> {
+        consumer.handle((Setup setup) -> {
             try {
                 if (setup.isOnline()) {
                     if (manager.createQuery("select d from Setup d where d.ean = '" + setup.getEan() + "'")
