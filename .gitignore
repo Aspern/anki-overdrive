@@ -13,6 +13,7 @@ hs_err_pid*
 *.iml
 
 # Maven
+/**/target/
 target/
 out/
 
