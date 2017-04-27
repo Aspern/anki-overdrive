@@ -104,7 +104,7 @@ console.log($scope.api_getSetup);
 $scope.refreshSetupAPI = function()
 {
 
-    var setupData = $resource('http://demo1910725.mockable.io/data');
+    var setupData = $resource('/rest/setup');
             
             setupData.query(function(data)
             {
@@ -117,7 +117,7 @@ $scope.refreshSetupAPI = function()
             });
 
 
-   /* for(var i=0;i<$scope.api_getSetup.length;i++)
+   for(var i=0;i<$scope.api_getSetup.length;i++)
     {
 
          var scenarioData = $resource(scenarioURL+'/'+$scope.api_getSetup[i].uuid+'/scenario');
@@ -125,23 +125,23 @@ $scope.refreshSetupAPI = function()
 
                 var x  = angular.toJson(data);
                 $scope.scenarioArray = angular.fromJson(x);
-         
- 
+
+
             });
 
-    } */
+    }
 
 
-    var scenarioData = $resource('http://demo1910725.mockable.io/');
-           
-            scenarioData.query(function(data)
-            {
-
-                var x  = angular.toJson(data);
-                $scope.scenarioArray = angular.fromJson(x);
-         
- 
-            });
+    // var scenarioData = $resource('http://demo1910725.mockable.io/');
+    //
+    //         scenarioData.query(function(data)
+    //         {
+    //
+    //             var x  = angular.toJson(data);
+    //             $scope.scenarioArray = angular.fromJson(x);
+    //
+    //
+    //         });
 
 };
 

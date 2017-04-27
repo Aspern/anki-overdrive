@@ -16,6 +16,7 @@ public class Vehicle {
     private String uuid;
     private String address;
     private String name;
+    private boolean connected;
 
     public long getId() {
         return id;
@@ -49,4 +50,11 @@ public class Vehicle {
         this.name = name;
     }
 
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
+    }
 }

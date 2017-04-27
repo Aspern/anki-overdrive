@@ -10,7 +10,8 @@ public class Setup {
 
     @Id
     private String ean;
-    private String name;
+    private String uuid;
+    private String websocket;
     @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Vehicle> vehicles;
     @OneToOne(cascade = CascadeType.PERSIST, orphanRemoval = true)
@@ -49,11 +50,19 @@ public class Setup {
         this.ean = ean;
     }
 
-    public String getName() {
-        return name;
+    public String getUuid() {
+        return uuid;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public String getWebsocket() {
+        return websocket;
+    }
+
+    public void setWebsocket(String websocket) {
+        this.websocket = websocket;
     }
 }
