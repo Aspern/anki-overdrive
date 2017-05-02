@@ -217,7 +217,7 @@ for(var i=0; i<$scope.api_getSetup.length;i++)
 {
 
     kit = $scope.api_getSetup[i];
-    ws[kit.uuid] = $websocket.$new(kit.websocket);
+    ws[kit.uuid] = $websocket.$new(kit.websocket, 'echo-protocol');
     for(var j=0 ; j< kit.vehicles.length; j++)
     {
         console.log(kit.vehicles[j]);
@@ -268,7 +268,7 @@ $scope.createSpeedoMeter(); // creating speedometer on runtime
 $scope.webSocketConnection(); // establishing websocket connections
 
 
-$scope.sendWebSocketMessage = function (setupID,vehicleID,messageType,value)
+$scope.sendWebSocketMessage = function (setuäpID,vehicleID,messageType,value)
 {
 
 
@@ -319,7 +319,7 @@ $scope.sendWebSocketMessage = function (setupID,vehicleID,messageType,value)
 
         var websocket_setupid = $scope.getSetupID(vehicleID.substring(2));
         var new_json = {
-                            "command" : 'set-offset',
+                            "command" : 'change-lane',
                             "vehicleId" : vehicleID.substring(2),
                             "payload" : {'offset' : value}
 
