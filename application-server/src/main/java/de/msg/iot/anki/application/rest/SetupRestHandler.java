@@ -2,14 +2,12 @@ package de.msg.iot.anki.application.rest;
 
 import de.msg.iot.anki.application.entity.Setup;
 import de.msg.iot.anki.application.entity.Vehicle;
+import de.msg.iot.anki.application.kafka.ScenarioKafkaProducer;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -19,12 +17,10 @@ import java.util.List;
 public class SetupRestHandler {
 
 
-    //    private static KafkaScenarioController scenarioController = new KafkaScenarioController();
-//    private static Map<String, KafkaVehicleController> controller = new HashMap<>();
+    private static final ScenarioKafkaProducer scenarioProducer = new ScenarioKafkaProducer();
     private static final List<String> scenarios = new ArrayList<String>() {{
         add("collision");
         add("anti-collision");
-        add("max-speed");
     }};
 
 
@@ -82,23 +78,6 @@ public class SetupRestHandler {
         return Response.status(404).build();
     }
 
-//    @POST
-//    @Path("/{setupId}/vehicle/{vehicleId}/set-speed")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response setSpeed(@PathParam("setupId") String setupId, @PathParam("vehicleId") String vehicleId, @QueryParam("speed") int speed, @QueryParam("acceleration") int acceleration) {
-//        Response response = vehicle(setupId, vehicleId);
-//
-//        if (response.getStatus() != 200)
-//            return Response.status(response.getStatus()).build();
-//
-//        try {
-//            Vehicle vehicle = response.readEntity(Vehicle.class);
-//            controller(vehicle.getUuid()).setSpeed(speed, acceleration);
-//            return Response.ok().build();
-//        } catch (Exception e) {
-//            return Response.status(500).entity(e).build();
-//        }
-//    }
 
     @GET
     @Path("/{setupId}/track")
@@ -124,60 +103,47 @@ public class SetupRestHandler {
 
         return Response.ok(scenarios).build();
     }
-//
-//    @POST
-//    @Path("/{setupId}/scenario/{name}/start")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response startScenario(@PathParam("setupId") String setupId, @PathParam("name") String name) {
-//        Setup setup = manager.find(Setup.class, setupId);
-//
-//        if (setup == null || !scenarios.contains(name))
-//            return Response.status(404).build();
-//
-//        switch (name) {
-//            case "collision":
-//                scenarioController.collisionScenario(false);
-//                return Response.ok().build();
-//            case "anti-collision":
-//                scenarioController.antiCollisionScenario(false);
-//                return Response.ok().build();
-//            case "max-speed":
-//                scenarioController.maxSpeedScenario(false);
-//                return Response.ok().build();
-//            default:
-//                return Response.status(404).build();
-//        }
-//    }
 
-//    @POST
-//    @Path("/{setupId}/scenario/{name}/interrupt")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response interruptScenario(@PathParam("setupId") String setupId, @PathParam("name") String name) {
-//        Setup setup = manager.find(Setup.class, setupId);
-//
-//        if (setup == null || !scenarios.contains(name))
-//            return Response.status(404).build();
-//
-//        switch (name) {
-//            case "collision":
-//                scenarioController.collisionScenario(true);
-//                return Response.ok().build();
-//            case "anti-collision":
-//                scenarioController.antiCollisionScenario(true);
-//                return Response.ok().build();
-//            case "max-speed":
-//                scenarioController.maxSpeedScenario(true);
-//                return Response.ok().build();
-//            default:
-//                return Response.status(404).build();
-//        }
-//    }
+    @POST
+    @Path("/{setupId}/scenario/{name}/start")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response startScenario(@PathParam("setupId") String setupId, @PathParam("name") String name) {
+        Setup setup = manager.find(Setup.class, setupId);
 
+        if (setup == null || !scenarios.contains(name))
+            return Response.status(404).build();
 
-//    private KafkaVehicleController controller(String uuid) {
-//        if (!controller.containsKey(uuid))
-//            controller.put(uuid, new KafkaVehicleController(uuid));
-//
-//        return controller.get(uuid);
-//    }
+        switch (name) {
+            case "collision":
+                scenarioProducer.startCollision();
+                return Response.ok().build();
+            case "anti-collision":
+                scenarioProducer.startAntiCollision();
+                return Response.ok().build();
+            default:
+                return Response.status(404).build();
+        }
+    }
+
+    @POST
+    @Path("/{setupId}/scenario/{name}/interrupt")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response interruptScenario(@PathParam("setupId") String setupId, @PathParam("name") String name) {
+        Setup setup = manager.find(Setup.class, setupId);
+
+        if (setup == null || !scenarios.contains(name))
+            return Response.status(404).build();
+
+        switch (name) {
+            case "collision":
+                scenarioProducer.stopCollision();
+                return Response.ok().build();
+            case "anti-collision":
+                scenarioProducer.stopAntiCollision();
+                return Response.ok().build();
+            default:
+                return Response.status(404).build();
+        }
+    }
+
 }

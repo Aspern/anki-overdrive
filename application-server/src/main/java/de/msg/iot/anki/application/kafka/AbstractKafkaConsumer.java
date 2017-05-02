@@ -17,7 +17,7 @@ public abstract class AbstractKafkaConsumer<T> implements Runnable {
     private final Gson serializer = new Gson();
     private volatile boolean running = true;
 
-    AbstractKafkaConsumer(String... topics) {
+    protected AbstractKafkaConsumer(String... topics) {
         final Settings settings = new PropertiesSettings("settings.properties");
 
         Properties props = new Properties();
