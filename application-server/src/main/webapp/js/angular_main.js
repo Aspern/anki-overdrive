@@ -19,9 +19,9 @@ var myEl = angular.element( document.querySelector( '#terminal' ) );
 
 /* REST API URLS */
 
-var portAddress = 'http://localhost:8080/anki/rest'
-var setupURL = portAddress + '/setup';
-var scenarioURL = portAddress+ '/setup'
+//var portAddress = 'http://localhost:8080/anki/rest';
+//var setupURL = portAddress + '/setup';
+//var scenarioURL = portAddress+ '/setup';
 
 
 /* REST API URLS ends here*/
@@ -33,13 +33,8 @@ var scenarioURL = portAddress+ '/setup'
 $scope.scenarioArray = [ "anti-collision", "collision","Scenario A" ];
 
 
-
-
-
 $scope.checkBoxClicked = function($checkbox,$index)
 {
-    console.log($checkbox,$index);
-    console.log($scope.scenarioArray[$index]);
 
     var action = $checkbox ? 'start' : 'interupt';
 
@@ -49,7 +44,7 @@ $scope.checkBoxClicked = function($checkbox,$index)
     }
 
     $scope.updateTerminalStatus($scope.scenarioArray[$index], $checkbox);
-}
+};
 
 /* Scenario ends here */
 
@@ -65,13 +60,11 @@ $scope.updateTerminalStatus = function($scenarioName,$status)
 
     myEl.append('>> ['+$scope.date+'] '+ statusnew +' '+ $scenarioName +'... '+'<br>');
 
-    console.log("update terminal");
-
-}
+};
 
 $scope.newDate = function () {
       $scope.date = new Date();
-}
+};
 
 
 /* Terminal ends here*/
@@ -98,13 +91,10 @@ $scope.newDate = function () {
 
 /* REST SERVICE FUNCITONS */
 
-console.log($scope.api_getSetup);
-
-
 $scope.refreshSetupAPI = function()
 {
 
-    var setupData = $resource('/rest/setup');
+    var setupData = $resource('http://demo1910725.mockable.io/data');
             
             setupData.query(function(data)
             {
@@ -116,32 +106,32 @@ $scope.refreshSetupAPI = function()
  
             });
 
+   //
+   // for(var i=0;i<$scope.api_getSetup.length;i++)
+   //  {
+   //
+   //       var scenarioData = $resource(scenarioURL+'/'+$scope.api_getSetup[i].uuid+'/scenario');
+   //          scenarioData.query(function(data){
+   //
+   //              var x  = angular.toJson(data);
+   //              $scope.scenarioArray = angular.fromJson(x);
+   //
+   //
+   //          });
+   //
+   //  }
 
-   for(var i=0;i<$scope.api_getSetup.length;i++)
-    {
 
-         var scenarioData = $resource(scenarioURL+'/'+$scope.api_getSetup[i].uuid+'/scenario');
-            scenarioData.query(function(data){
+    var scenarioData = $resource('http://demo1910725.mockable.io/');
+
+            scenarioData.query(function(data)
+            {
 
                 var x  = angular.toJson(data);
                 $scope.scenarioArray = angular.fromJson(x);
 
 
             });
-
-    }
-
-
-    // var scenarioData = $resource('http://demo1910725.mockable.io/');
-    //
-    //         scenarioData.query(function(data)
-    //         {
-    //
-    //             var x  = angular.toJson(data);
-    //             $scope.scenarioArray = angular.fromJson(x);
-    //
-    //
-    //         });
 
 };
 
@@ -153,48 +143,108 @@ $scope.refreshSetupAPI(); //initially fetching the data from the rest API
 
 
 
-/* WEBSOCKET STARTS HERE */
-
-$scope.webSocketConnection = function()
-{
 
 
-    for(var i=0; i<$scope.api_getSetup.length;i++) //connecting all websocket ports from the rest API
+//send messages to websocket
+    $scope.sendWebSocketMessage = function (setupID,vehicleID,messageType,value)
+    {
+        if(messageType == 'connection')
+        {
+            var val = value ? "disconnect" : "connect";
+
+            var json_conn = {
+                "command" : ""+val,
+                "vehicleId": ""+vehicleID
+            };
+
+            var val = value ? "disable-listener" : "enable-listener";
+
+            var json_listener = {
+                "command" : ""+val,
+                "vehicleId": ""+vehicleID
+            };
+
+            ws[setupID].$emit('webgui',json_conn);
+            ws[setupID].$emit('webgui',json_listener);
+        }
+
+        else if(messageType == 'changeSpeed')
+        {
+
+            var websocket_setupid = $scope.getSetupID(vehicleID.substring(1));
+            var new_json = {
+                "command" : 'set-speed',
+                "vehicleId" : vehicleID.substring(1),
+                "payload" : {'speed' : value}
+
+            };
+
+            //$timeout($scope.speedometer[vehicleID].needleVal = value, 10);
+            ws[websocket_setupid].$emit('webgui',new_json);
+
+        }
+
+        else if(messageType == 'changeLane')
+        {
+
+            var websocket_setupid = $scope.getSetupID(vehicleID.substring(2));
+            var new_json = {
+                "command" : 'change-lane',
+                "vehicleId" : vehicleID.substring(2),
+                "payload" : {'offset' : value}
+
+            };
+            ws[websocket_setupid].$emit('webgui',new_json);
+
+        }
+
+        else if(messageType == 'applyBrake')
+        {
+            var websocket_setupid = $scope.getSetupID(vehicleID.substring(1));
+            var new_json = {
+                "command" : 'brake',
+                "vehicleId" : vehicleID.substring(1),
+                "payload" : {}
+
+            };
+            ws[websocket_setupid].$emit('webgui',new_json);
+
+        }
+
+
+    };
+
+
+
+    /* WEBSOCKET STARTS HERE */
+
+    $scope.webSocketConnection = function(setupID,vehicleID,messageType,value)
     {
 
-        ws[$scope.api_getSetup[i].uuid].$on('$open', function () {
+        ws[setupID].$on('$open', function () {
 
-            for(var j=0;j<$scope.api_getSetup.length;j++)
-            {
-
-                ws[$scope.api_getSetup[j].uuid].$emit('webgui',''+$scope.api_getSetup[j].uuid+' '+$scope.api_getSetup[j].websocket); // it sends the event on connection
-
-             }
+            if(value)
+            $scope.sendWebSocketMessage(setupID,vehicleID,messageType,false); // sending enable-listener when there is a websocket connection.
 
 
         })
-        .$on('$message',function (message) { // it listents for incoming 'messages'
-
-            console.log(message);
-
-            if(message.command === "enable-listener")
-            {
-
-                  $timeout($scope.speedometer[message.vehicleId].needleVal = message.payload.speed,2); 
-            }
-
-            
-    
-
-        });
-    }
-
-};
+            .$on('$message',function (message) { // it listents for incoming 'messages'
 
 
-/* WEBSOCKET ENDS HERE*/
+                if(message.command === "enable-listener")
+                {
+
+                    $timeout($scope.speedometer[message.vehicleId].needleVal = message.payload.speed,2);
+                }
 
 
+            });
+
+
+    };
+
+
+    /* WEBSOCKET ENDS HERE*/
 
 
 /* CARS CONTROLLER STARTS HERE */
@@ -202,28 +252,24 @@ $scope.webSocketConnection = function()
 
 $scope.createSpeedoMeter = function()
 {
-    console.log($scope.api_getSetup);
-
-
     kit.length = 0;
     ws.length = 0;
     $scope.speedometer.length = 0;
     vehicles.length = 0;
     $scope.allVehicles = null;
 
-
-
 for(var i=0; i<$scope.api_getSetup.length;i++)
 {
-
     kit = $scope.api_getSetup[i];
     ws[kit.uuid] = $websocket.$new(kit.websocket, 'echo-protocol');
+    $scope.webSocketConnection(kit.uuid);
+
     for(var j=0 ; j< kit.vehicles.length; j++)
     {
-        console.log(kit.vehicles[j]);
+        $scope.webSocketConnection(kit.uuid,kit.vehicles[j].uuid,'connection',kit.vehicles[j].connected);
+
         if(kit.vehicles[j].connected)
         {
-        
             vehiclesInSetup[kit.vehicles[j].uuid] = kit.uuid;
             vehicles.push(kit.vehicles[j]);
             $scope.speedometer[kit.vehicles[j].uuid] = { // creating an array of speedometer with unique car id's
@@ -247,7 +293,7 @@ for(var i=0; i<$scope.api_getSetup.length;i++)
             };
 
         if(kit.vehicles[j].name == "Skull") //if the car is red change color scheme of the speedometer
-            { 
+            {
                 $scope.speedometer[kit.vehicles[j].uuid].needleCol = '#b20000';
                 $scope.speedometer[kit.vehicles[j].uuid].outerEdgeCol = '#b20000';
                 $scope.speedometer[kit.vehicles[j].uuid].tickColMaj= '#b20000';
@@ -265,84 +311,6 @@ $scope.allVehicles = vehicles;
 };
 
 $scope.createSpeedoMeter(); // creating speedometer on runtime
-$scope.webSocketConnection(); // establishing websocket connections
-
-
-$scope.sendWebSocketMessage = function (setuäpID,vehicleID,messageType,value)
-{
-
-
-    if(messageType === 'connection')
-    {
-        $scope.refreshSetupAPI(); // fetching new data from API about all the available cars and setups
-        $scope.webSocketConnection(); // establishing websocket connections
-
-    
-        var val = value ? "disconnect" : "connect";
-        
-        var json_conn = [{
-                                "command" : ""+val,
-                                "vehicleId": ""+vehicleID
-                            }];
-
-        var val = value ? "disable-listener" : "enable-listener";
-
-        var json_listener = [{
-                                "command" : ""+val,
-                                "vehicleId": ""+vehicleID
-                            }];
-
-
-        ws[setupID].$emit('webgui',json_conn);
-        ws[setupID].$emit('webgui',json_listener);
-    }
-
-    else if(messageType === 'changeSpeed')
-    {
-        
-        var websocket_setupid = $scope.getSetupID(vehicleID.substring(1));
-        var new_json = {
-                            "command" : 'set-speed',
-                            "vehicleId" : vehicleID.substring(1),
-                            "payload" : {'speed' : value}
-
-                        };
-
-        //$timeout($scope.speedometer[vehicleID].needleVal = value, 10);       
-        ws[websocket_setupid].$emit('webgui',new_json);
-
-    }
-
-    else if(messageType === 'changeLane')
-    {
-        console.log("changelane was called");
-
-        var websocket_setupid = $scope.getSetupID(vehicleID.substring(2));
-        var new_json = {
-                            "command" : 'change-lane',
-                            "vehicleId" : vehicleID.substring(2),
-                            "payload" : {'offset' : value}
-
-                        };
-        ws[websocket_setupid].$emit('webgui',new_json);
-
-    }
-
-    else if(messageType == 'applyBrake')
-    {
-        var websocket_setupid = $scope.getSetupID(vehicleID.substring(1));
-        var new_json = {
-                            "command" : 'brake',
-                            "vehicleId" : vehicleID.substring(1),
-                            "payload" : {}
-
-                        };
-        ws[websocket_setupid].$emit('webgui',new_json);
-
-    }
-
-
-};
 
 
 $scope.getSetupID = function(vehicleid)
@@ -350,22 +318,10 @@ $scope.getSetupID = function(vehicleid)
     
     return vehiclesInSetup[vehicleid];
 
-}
-
-
-
-
-
-
+};
 
 
 /* CARS CONTROLLER ENDS HERE */
 
 
-
-
-
-	
-	
-	
 });
