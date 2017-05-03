@@ -93,45 +93,43 @@ $scope.newDate = function () {
 
 $scope.refreshSetupAPI = function()
 {
-
-    var setupData = $resource('http://demo1910725.mockable.io/data');
+    //'http://demo1910725.mockable.io/data'
+    var setupData = $resource('/rest/setup');
             
             setupData.query(function(data)
             {
-
                 var x  = angular.toJson(data);
                 $scope.api_getSetup = angular.fromJson(x);
                 $scope.createSpeedoMeter(); // creating speedometer again
 
- 
             });
 
-   //
-   // for(var i=0;i<$scope.api_getSetup.length;i++)
-   //  {
-   //
-   //       var scenarioData = $resource(scenarioURL+'/'+$scope.api_getSetup[i].uuid+'/scenario');
-   //          scenarioData.query(function(data){
-   //
-   //              var x  = angular.toJson(data);
-   //              $scope.scenarioArray = angular.fromJson(x);
-   //
-   //
-   //          });
-   //
-   //  }
 
+   for(var i=0;i<$scope.api_getSetup.length;i++)
+    {
 
-    var scenarioData = $resource('http://demo1910725.mockable.io/');
-
-            scenarioData.query(function(data)
-            {
+         var scenarioData = $resource('/rest/setup'+'/'+$scope.api_getSetup[i].uuid+'/scenario');
+            scenarioData.query(function(data){
 
                 var x  = angular.toJson(data);
                 $scope.scenarioArray = angular.fromJson(x);
 
 
             });
+
+    }
+
+
+    // var scenarioData = $resource('http://demo1910725.mockable.io/');
+    //
+    //         scenarioData.query(function(data)
+    //         {
+    //
+    //             var x  = angular.toJson(data);
+    //             $scope.scenarioArray = angular.fromJson(x);
+    //
+    //
+    //         });
 
 };
 
