@@ -19,9 +19,9 @@ var myEl = angular.element( document.querySelector( '#terminal' ) );
 
 /* REST API URLS */
 
-//var portAddress = 'http://localhost:8080/anki/rest';
+//var portAddress = 'http://localhost:8080/rest';
 //var setupURL = portAddress + '/setup';
-//var scenarioURL = portAddress+ '/setup';
+var scenarioURL = '/rest/setup';
 
 
 /* REST API URLS ends here*/
@@ -36,11 +36,11 @@ $scope.scenarioArray = [ "anti-collision", "collision","Scenario A" ];
 $scope.checkBoxClicked = function($checkbox,$index)
 {
 
-    var action = $checkbox ? 'start' : 'interupt';
+    var action = $checkbox ? 'start' : 'interrupt';
 
     for(var i=0; i<$scope.api_getSetup.length;i++)
     {
-        $scope.sendReq(scenarioURL+'/'+$scope.api_getSetup[i].uuid+'/scenario/'+$scope.scenarioArray[$index]+'/'+action);
+        $scope.sendReq(scenarioURL+'/'+$scope.api_getSetup[i].ean+'/scenario/'+$scope.scenarioArray[$index]+'/'+action);
     }
 
     $scope.updateTerminalStatus($scope.scenarioArray[$index], $checkbox);
