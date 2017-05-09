@@ -2,7 +2,9 @@ package de.msg.iot.anki.application.rest;
 
 import de.msg.iot.anki.application.entity.Setup;
 import de.msg.iot.anki.application.entity.Vehicle;
+import de.msg.iot.anki.application.entity.VehicleCommand;
 import de.msg.iot.anki.application.kafka.ScenarioKafkaProducer;
+import de.msg.iot.anki.application.kafka.VehicleCommandKafkaProducer;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -73,6 +75,54 @@ public class SetupRestHandler {
         for (Vehicle vehicle : setup.getVehicles()) {
             if (vehicleId.equals(vehicle.getUuid()))
                 return Response.ok(vehicle).build();
+        }
+
+        return Response.status(404).build();
+    }
+
+    @POST
+    @Path("/{setupId}/vehicle/{vehicleId}/connect")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response connect(@PathParam("setupId") String setupId, @PathParam("vehicleId") String vehicleId) {
+        Setup setup = manager.find(Setup.class, setupId);
+
+        if (setup == null)
+            return Response.status(404).build();
+
+        for (Vehicle vehicle : setup.getVehicles()) {
+            if (vehicleId.equals(vehicle.getUuid())) {
+                final VehicleCommandKafkaProducer producer = new VehicleCommandKafkaProducer(vehicleId);
+                producer.sendMessage(
+                        new VehicleCommand("connect")
+                );
+                vehicle.setConnected(true);
+                manager.persist(setup);
+                return Response.ok().build();
+            }
+        }
+
+        return Response.status(404).build();
+    }
+
+    @POST
+    @Path("/{setupId}/vehicle/{vehicleId}/disconnect")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response disconnect(@PathParam("setupId") String setupId, @PathParam("vehicleId") String vehicleId) {
+        Setup setup = manager.find(Setup.class, setupId);
+
+        if (setup == null)
+            return Response.status(404).build();
+
+        for (Vehicle vehicle : setup.getVehicles()) {
+            if (vehicleId.equals(vehicle.getUuid())) {
+                final VehicleCommandKafkaProducer producer = new VehicleCommandKafkaProducer(vehicleId);
+                producer.sendMessage(
+                        new VehicleCommand("disconnect")
+                );
+                vehicle.setConnected(false);
+                manager.persist(setup);
+                return Response.ok().build();
+            }
         }
 
         return Response.status(404).build();

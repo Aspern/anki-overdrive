@@ -108,7 +108,7 @@ $scope.refreshSetupAPI = function()
    for(var i=0;i<$scope.api_getSetup.length;i++)
     {
 
-         var scenarioData = $resource('/rest/setup'+'/'+$scope.api_getSetup[i].uuid+'/scenario');
+         var scenarioData = $resource('/rest/setup'+'/'+$scope.api_getSetup[i].ean+'/scenario');
             scenarioData.query(function(data){
 
                 var x  = angular.toJson(data);
