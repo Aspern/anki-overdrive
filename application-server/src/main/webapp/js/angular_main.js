@@ -141,6 +141,8 @@ $scope.sendConnectionRequest = function(url,value)
     var val = value ? "disconnect" : "connect";
 
     $scope.sendReq(url+val);
+    $scope.refreshSetupAPI(); //initially fetching the data from the rest API
+
 
 
 
@@ -232,6 +234,8 @@ $scope.sendConnectionRequest = function(url,value)
 
                 if(message.command === "enable-listener")
                 {
+
+                    console.log(message.payload);
 
                     $timeout($scope.speedometer[message.vehicleId].needleVal = message.payload.speed,2);
 
