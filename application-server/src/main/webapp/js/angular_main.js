@@ -159,13 +159,6 @@ $scope.sendConnectionRequest = function(url,value)
     {
         if(messageType == 'connection')
         {
-            /*var val = value ? "disconnect" : "connect";
-
-            var json_conn = {
-                "command" : ""+val,
-                "vehicleId": ""+vehicleID
-            };*/
-
             var val = value ? "disable-listener" : "enable-listener";
 
             var json_listener = {
@@ -173,7 +166,6 @@ $scope.sendConnectionRequest = function(url,value)
                 "vehicleId": ""+vehicleID
             };
 
-            //ws[setupID].$emit('webgui',json_conn);
             ws[setupID].$emit('webgui',json_listener);
         }
 
