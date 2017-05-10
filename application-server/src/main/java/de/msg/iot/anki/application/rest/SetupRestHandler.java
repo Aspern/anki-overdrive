@@ -95,8 +95,9 @@ public class SetupRestHandler {
                 producer.sendMessage(
                         new VehicleCommand("connect")
                 );
+                manager.getTransaction().begin();
                 vehicle.setConnected(true);
-                manager.persist(setup);
+                manager.getTransaction().commit();
                 return Response.ok().build();
             }
         }
@@ -119,8 +120,9 @@ public class SetupRestHandler {
                 producer.sendMessage(
                         new VehicleCommand("disconnect")
                 );
+                manager.getTransaction().begin();
                 vehicle.setConnected(false);
-                manager.persist(setup);
+                manager.getTransaction().commit();
                 return Response.ok().build();
             }
         }
