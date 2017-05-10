@@ -150,10 +150,6 @@ $scope.sendConnectionRequest = function(url,value)
 
 /* REST SERVICE FUNCTIONS ends here*/
 
-
-
-
-
 //send messages to websocket
     $scope.sendWebSocketMessage = function (setupID,vehicleID,messageType,value)
     {
@@ -238,6 +234,7 @@ $scope.sendConnectionRequest = function(url,value)
                 {
 
                     $timeout($scope.speedometer[message.vehicleId].needleVal = message.payload.speed,2);
+
                 }
 
 
