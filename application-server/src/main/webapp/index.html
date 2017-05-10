@@ -108,7 +108,7 @@
                                                     <td><strong>{{val.uuid}} - {{car.uuid}}</strong></td>
                                                     <td><strong>{{val.name}}</strong></td>
                                                     <td><span ng-class="val.connected ? 'label label-success' : 'label label-danger'">{{val.connected ? 'Connected' : 'Disconnected'}}</span></td>
-                                                    <td><button type="button" ng-click="sendWebSocketMessage(car.uuid,val.uuid,'connection',val.connected);refreshSetupAPI();" ng-class="val.connected ? 'btn btn-primary' : 'btn'">{{val.connected ? 'Disconnect' : 'Connect'}}</button></td>
+                                                    <td><button type="button" ng-click="sendConnectionRequest('/rest/setup/'+car.ean+'/'+val.uuid+'/',val.connected);sendWebSocketMessage(car.uuid,val.uuid,'connection',val.connected);refreshSetupAPI();" ng-class="val.connected ? 'btn btn-primary' : 'btn'">{{val.connected ? 'Disconnect' : 'Connect'}}</button></td>
                                               </tr>
                                                                             
                                             </tbody>

@@ -135,6 +135,17 @@ $scope.refreshSetupAPI = function()
 
 $scope.refreshSetupAPI(); //initially fetching the data from the rest API
 
+$scope.sendConnectionRequest = function(url,value)
+{
+
+    var val = value ? "disconnect" : "connect";
+
+    $scope.sendReq(url+val);
+
+
+
+}
+
 
 
 /* REST SERVICE FUNCTIONS ends here*/
@@ -148,12 +159,12 @@ $scope.refreshSetupAPI(); //initially fetching the data from the rest API
     {
         if(messageType == 'connection')
         {
-            var val = value ? "disconnect" : "connect";
+            /*var val = value ? "disconnect" : "connect";
 
             var json_conn = {
                 "command" : ""+val,
                 "vehicleId": ""+vehicleID
-            };
+            };*/
 
             var val = value ? "disable-listener" : "enable-listener";
 
@@ -162,7 +173,7 @@ $scope.refreshSetupAPI(); //initially fetching the data from the rest API
                 "vehicleId": ""+vehicleID
             };
 
-            ws[setupID].$emit('webgui',json_conn);
+            //ws[setupID].$emit('webgui',json_conn);
             ws[setupID].$emit('webgui',json_listener);
         }
 
@@ -227,6 +238,8 @@ $scope.refreshSetupAPI(); //initially fetching the data from the rest API
 
         })
             .$on('$message',function (message) { // it listents for incoming 'messages'
+
+                console.log("message received "+message);
 
 
                 if(message.command === "enable-listener")
