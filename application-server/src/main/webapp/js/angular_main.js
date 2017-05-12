@@ -15,7 +15,7 @@ $scope.api_getSetup = {};
 $scope.date = new Date();
 var vehiclesInSetup = [];
 var myEl = angular.element( document.querySelector( '#terminal' ) );
-$scope.scenarioArray = ["Collision","Anti-collision"];
+$scope.scenarioArray = ["collision","anti-collision"];
 $scope.battery_level = [];
 
 
@@ -377,7 +377,8 @@ $scope.updateBatteryLevel = function(elementID,val)
     battery.val(val);
 
 
-    $scope.battery_level[elementID] = (val*100)+"%";
+    $scope.battery_level[elementID] = Math.round(val*100)+"%";
+
 
 
     console.log("updatebattery function"+$scope.battery_level[elementID]);
