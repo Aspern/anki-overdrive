@@ -108,7 +108,7 @@
                                                     <td><strong>{{val.uuid}} - {{car.uuid}}</strong></td>
                                                     <td><strong>{{val.name}}</strong></td>
                                                     <td><span ng-class="val.connected ? 'label label-success' : 'label label-danger'">{{val.connected ? 'Connected' : 'Disconnected'}}</span></td>
-                                                    <td><button type="button" ng-click="sendConnectionRequest('/rest/setup/'+car.ean+'/vehicle/'+val.uuid+'/',val.connected);sendWebSocketMessage(car.uuid,val.uuid,'connection',val.connected);refreshSetupAPI();" ng-class="val.connected ? 'btn btn-primary' : 'btn'">{{val.connected ? 'Disconnect' : 'Connect'}}</button></td>
+                                                    <td><button type="button" ng-click="sendConnectionRequest('/rest/setup/'+car.ean+'/vehicle/'+val.uuid+'/',val.connected);sendWebSocketMessage(car.uuid,val.uuid,'connection',val.connected);" ng-class="val.connected ? 'btn btn-primary' : 'btn'">{{val.connected ? 'Disconnect' : 'Connect'}}</button></td>
                                               </tr>
                                                                             
                                             </tbody>
@@ -184,15 +184,16 @@
                         
                         <div class="panel-body">
                                 
-                            <div style="float: right;"> <i style="margin-right: 2px;">100%</i> <meter value="0.6"></meter></div>
+                            <div style="float: right;"> <i style="margin-right: 2px;">{{battery_level[vehicle.uuid]}}</i> <meter id="bat{{vehicle.uuid}}" value="1.0"></meter></div>
 
                             <br>
                             
                             <div align="center" style="text-align: center;margin:0 auto;float-left:auto;float-right:auto;display: table;"><meter-gauge gaugeconfig="speedometer[vehicle.uuid]"></meter-gauge></div>
 
-                                <div align="center"><input type="range" min="0" max="1000" id="s{{vehicle.uuid}}" step="5" onchange="rangevalue1.value=value; angular.element(this).scope().sendWebSocketMessage(0,id,'changeSpeed',value);" style="width: 80%;text-align: center;" /></div>
+                                <div align="center"><input type="range" min="0" max="1000" id="s{{vehicle.uuid}}" value="0" step="5" onchange="angular.element(this).scope().updateSpeedRange(id,value);
+                                    angular.element(this).scope().sendWebSocketMessage(0,id,'changeSpeed',value);" style="width: 80%;text-align: center;" /></div>
 
-                                <div align="center"><output id="rangevalue1">{{speedometer[vehicle.uuid].needleVal}}</output></div>
+                                <div align="center"><output id="range{{vehicle.uuid}}">0</output></div>
        
                                     <div align="center" style="margin-top: 10px;">
                                         <div class="btn-group" style="margin-bottom: 20px;">

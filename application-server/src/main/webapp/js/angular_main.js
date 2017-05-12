@@ -8,13 +8,15 @@ $scope.speedometer = [];
 var vehicles = [];
 var kit = [];
 var ws = [];
+var interval_vehicle = [];
 $scope.scenarioStatus = {};
 var response;
 $scope.api_getSetup = {};
 $scope.date = new Date();
 var vehiclesInSetup = [];
 var myEl = angular.element( document.querySelector( '#terminal' ) );
-
+$scope.scenarioArray = ["Collision","Anti-collision"];
+$scope.battery_level = [];
 
 
 /* REST API URLS */
@@ -30,7 +32,6 @@ var scenarioURL = '/rest/setup';
 
 /* Scenario Starts here*/
 
-$scope.scenarioArray = [ "anti-collision", "collision","Scenario A" ];
 
 
 $scope.checkBoxClicked = function($checkbox,$index)
@@ -89,10 +90,12 @@ $scope.newDate = function () {
 
 /* POST service ends here */
 
+
 /* REST SERVICE FUNCITONS */
 
 $scope.refreshSetupAPI = function()
 {
+
     //'http://demo1910725.mockable.io/data'
     var setupData = $resource('/rest/setup');
             
@@ -101,6 +104,7 @@ $scope.refreshSetupAPI = function()
                 var x  = angular.toJson(data);
                 $scope.api_getSetup = angular.fromJson(x);
                 $scope.createSpeedoMeter(); // creating speedometer again
+
 
             });
 
@@ -120,20 +124,9 @@ $scope.refreshSetupAPI = function()
     }
 
 
-    // var scenarioData = $resource('http://demo1910725.mockable.io/');
-    //
-    //         scenarioData.query(function(data)
-    //         {
-    //
-    //             var x  = angular.toJson(data);
-    //             $scope.scenarioArray = angular.fromJson(x);
-    //
-    //
-    //         });
-
 };
 
-$scope.refreshSetupAPI(); //initially fetching the data from the rest API
+$scope.refreshSetupAPI(); // fetching REST data onLoad
 
 $scope.sendConnectionRequest = function(url,value)
 {
@@ -141,12 +134,14 @@ $scope.sendConnectionRequest = function(url,value)
     var val = value ? "disconnect" : "connect";
 
     $scope.sendReq(url+val);
-    $scope.refreshSetupAPI(); //initially fetching the data from the rest API
+    setTimeout(function(){
+
+        $scope.refreshSetupAPI();
+
+    },800);
 
 
-
-
-}
+};
 
 
 
@@ -165,6 +160,32 @@ $scope.sendConnectionRequest = function(url,value)
             };
 
             ws[setupID].$emit('webgui',json_listener);
+
+            if(value)
+            {
+                clearInterval(interval_vehicle[vehicleID]); // clearing battery level request if car is disconnected
+                interval_vehicle.length = 0; // clearing the array
+            }
+            else if(!value)
+            {
+
+                if(interval_vehicle[vehicleID]== null)
+                {
+                //this is called for the 2nd time after the websocket connection is already established and user connects the car again
+                interval_vehicle[vehicleID]= setInterval(function(){
+
+                    var json_battery_listener = {
+                        "command" : "query-battery-level",
+                        "vehicleId": ""+vehicleID
+                    };
+
+                    ws[setupID].$emit('webgui',json_battery_listener);
+
+                },6000);
+                }
+
+            }
+
         }
 
         else if(messageType == 'changeSpeed')
@@ -223,22 +244,39 @@ $scope.sendConnectionRequest = function(url,value)
         ws[setupID].$on('$open', function () {
 
             if(value)
-            $scope.sendWebSocketMessage(setupID,vehicleID,messageType,false); // sending enable-listener when there is a websocket connection.
+            {
+                $scope.sendWebSocketMessage(setupID,vehicleID,messageType,false);
+             // sending enable-listener when there is a websocket connection.
+
+
+            //sending battery level request once the connection is made
+            interval_vehicle[vehicleID]= setInterval(function(){
+
+                var json_battery_listener = {
+                    "command" : "query-battery-level",
+                    "vehicleId": ""+vehicleID
+                };
+
+                ws[setupID].$emit('webgui',json_battery_listener);
+
+            },6000);
+            }
+
 
 
         })
             .$on('$message',function (message) { // it listents for incoming 'messages'
 
-                console.log("message received "+message);
-
 
                 if(message.command === "enable-listener")
                 {
+                    $scope.speedometer[message.vehicleId].needleVal = message.payload.speed;
 
-                    console.log(message.payload);
-
-                    $timeout($scope.speedometer[message.vehicleId].needleVal = message.payload.speed,2);
-
+                }
+                else if(message.command == "query-battery-level")
+                {
+                    //change battery level here
+                    $scope.updateBatteryLevel(message.vehicleId,message.payload.batteryLevel);
                 }
 
 
@@ -324,6 +362,29 @@ $scope.getSetupID = function(vehicleid)
 
 };
 
+$scope.updateSpeedRange = function(elementID,val)
+{
+    var elemid = '#range'+elementID.substring(1);
+    var range = angular.element( document.querySelector( elemid ) );
+    range.val(val);
+
+};
+
+$scope.updateBatteryLevel = function(elementID,val)
+{
+    var elemid = '#bat'+elementID;
+    var battery = angular.element( document.querySelector( elemid ) );
+    battery.val(val);
+
+
+    $scope.battery_level[elementID] = (val*100)+"%";
+
+
+    console.log("updatebattery function"+$scope.battery_level[elementID]);
+    $scope.$apply();
+
+
+};
 
 /* CARS CONTROLLER ENDS HERE */
 
