@@ -8,6 +8,8 @@
     <modules>
         <module>settings</module>
         <module>application-server</module>
+        <module>anti-collision-spark</module>
+        <module>elasticplayground</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -30,6 +32,12 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+            <version>3.5.3-beta</version>
             <scope>test</scope>
         </dependency>
         <dependency>
