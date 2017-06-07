@@ -17,6 +17,9 @@ var vehiclesInSetup = [];
 var myEl = angular.element( document.querySelector( '#terminal' ) );
 $scope.scenarioArray = ["collision","anti-collision"];
 $scope.battery_level = [];
+$scope.disable = {};
+$scope.parameter_div = false;
+
 
 
 /* REST API URLS */
@@ -28,30 +31,67 @@ var scenarioURL = '/rest/setup';
 
 /* REST API URLS ends here*/
 
+$scope.setParameterDiv = function(val){
+
+    $scope.parameter_div = val;
+    console.log("this function is called");
+};
+
+$scope.getParameterDiv = function(){
+
+    return $scope.parameter_div;
+};
+
+$scope.cancelAntiCollision = function()
+{
+    $scope.scenarioStatus['anti-collision'] = false;
+
+};
 
 
 /* Scenario Starts here*/
 
 
-
 $scope.checkBoxClicked = function($checkbox,$index)
 {
-
     var action = $checkbox ? 'start' : 'interrupt';
 
-    for(var i=0; i<$scope.api_getSetup.length;i++)
+    if(($index == 0 && $checkbox == false) || ($index == 1 && $checkbox == false) || ($index == 0 && $checkbox == true) ) // if the scenario is only collision
     {
-        $scope.sendReq(scenarioURL+'/'+$scope.api_getSetup[i].ean+'/scenario/'+$scope.scenarioArray[$index]+'/'+action);
+        for(var i=0; i<$scope.api_getSetup.length;i++) //for all kits
+        {
+            $scope.sendReq(scenarioURL+'/'+$scope.api_getSetup[i].ean+'/scenario/'+$scope.scenarioArray[$index]+'/'+action);
+        }
+        $scope.updateTerminalStatus($scope.scenarioArray[$index], $checkbox);
+
     }
 
-    $scope.updateTerminalStatus($scope.scenarioArray[$index], $checkbox);
+    if($index == 1 && $checkbox==false)
+        $scope.setParameterDiv(false);
+    else if($index == 1 && $checkbox==true)
+        $scope.setParameterDiv(true);
+
+};
+
+$scope.startAntiCollisionScenario = function()
+{
+
+    for(var i=0; i<$scope.api_getSetup.length;i++) //for all kits
+    {
+        $scope.sendReq(scenarioURL+'/'+$scope.api_getSetup[i].ean+'/scenario/'+$scope.scenarioArray[1]+'/'+'start');
+    }
+    $scope.updateTerminalStatus("Anti collision", true);
+
+
 };
 
 /* Scenario ends here */
 
 
 /* Terminal starts here*/
+$scope.date = new Date();
 
+myEl.append('>> ['+$scope.date+'] Establishing connection with the system... '+'<br>');
 
 $scope.updateTerminalStatus = function($scenarioName,$status)
 {
@@ -199,7 +239,10 @@ $scope.sendConnectionRequest = function(url,value)
 
             };
 
-            //$timeout($scope.speedometer[vehicleID].needleVal = value, 10);
+            if(value >= 0 || value <= 170)
+            $timeout($scope.speedometer[vehicleID.substring(1)].needleVal = value, 10);
+            console.log($scope.speedometer[vehicleID.substring(1)]);
+
             ws[websocket_setupid].$emit('webgui',new_json);
 
         }
@@ -271,6 +314,7 @@ $scope.sendConnectionRequest = function(url,value)
                 if(message.command === "enable-listener")
                 {
                     $scope.speedometer[message.vehicleId].needleVal = message.payload.speed;
+                    //console.log(message.payload);
 
                 }
                 else if(message.command == "query-battery-level")
@@ -322,7 +366,7 @@ for(var i=0; i<$scope.api_getSetup.length;i++)
                 tickSpaceMinVal: 10,
                 tickSpaceMajVal: 100,
                 divID: "gaugeBox",
-                gaugeUnits: "cms",
+                gaugeUnits: "mm/s",
                 tickColMaj:'#000066',
                 tickColMin:'#656D78',
                 outerEdgeCol:'#000066',

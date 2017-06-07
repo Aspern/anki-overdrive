@@ -6,7 +6,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
+
+
         <link rel="icon" href="" type="image/x-icon" />
         <!-- END META SECTION -->
         
@@ -44,7 +46,7 @@
                                 <div class="widget-item-left">
                                 
                                 <label class="switch" style="margin-top: 10px;">
-                                    <input type="checkbox" ng-model="scenarioStatus[n]" ng-click="checkBoxClicked(scenarioStatus[n],$index)" />
+                                    <input type="checkbox" id="CB_{{$index}}" ng-model="scenarioStatus[n]" ng-click="checkBoxClicked(scenarioStatus[n],$index);"/>
                                     <span></span>
                                 </label>     
 
@@ -69,6 +71,86 @@
                     <!-- END WIDGETS -->                  
                     
                     <div class="row">
+
+                        <div class="col-md-6" ng-show="parameter_div">
+
+                            <!-- START VISITORS BLOCK -->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div class="panel-title-box">
+                                        <h3>Parameters</h3>
+                                        <span>For Anti Collision Scenario</span>
+                                    </div>
+                                    <ul class="panel-controls" style="margin-top: 2px;">
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fa fa-cog"></span></a>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="#" class="panel-collapse"><span class="fa fa-angle-down"></span> Collapse</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="panel-body" >
+                                    <label class="col-md-4 control-label">Distance</label><div align="center"><input type="range" min="0" max="1500" id="distance_anticollision" value="0" step="5" onchange="range_distance_anticollision.value=this.value" style="width: 65%;text-align: center;" /></div>
+
+                                    <div align="center"><output id="range_distance_anticollision">0</output></div>
+
+
+                                    <tbody data-ng-repeat="car in api_getSetup">
+
+
+                                        <div class="form-group" data-ng-repeat="val in car.vehicles">
+                                            <label class="col-md-4 control-label">{{val.name}} [mm/s]</label>
+                                            <div class="col-md-4">
+                                                <input type="number" id="{{val.name}}" step="1" max="1500" class="form-control" placeholder="0-1500"/>
+                                            </div>
+                                        </div>
+
+
+                                    </tbody>
+
+                                    <div class="form-group" style="margin-top: 10px;">
+                                        <label class="col-md-4 control-label">Lane Number</label>
+                                        <div class="col-md-4">
+                                            <select class="form-control select">
+                                                <option>Lane 1</option>
+                                                <option>Lane 2</option>
+                                                <option>Lane 3</option>
+                                                <option>Lane 4</option>
+                                            </select>
+                                        </div>
+                                    </div><br>
+
+                                    <div style="margin-top: 30px;">
+
+                                            <label class="col-md-4 control-label">Break Strength</label><div align="center"><input type="range" min="0.01" max="1.0" id="break_anticollision" value="0" step="0.01" onchange="range_break_anticollision.value=this.value" style="width: 65%;text-align: center;" /></div>
+
+                                            <div align="center"><output id="range_break_anticollision">0</output></div>
+
+                                    </div>
+
+                                    <div style="margin-top: 20px;">
+
+                                        <label class="col-md-4 control-label">Acceleration Strength</label><div align="center"><input type="range" min="0.01" max="1.0" id="acceleration_anticollision" value="0" step="0.01" onchange="range_acceleration_anticollision.value=this.value" style="width: 65%;text-align: center;" /></div>
+
+                                        <div align="center"><output id="range_acceleration_anticollision">0</output></div>
+
+                                    </div>
+
+
+                                    <div class="form-group" align="right">
+                                        <button type="button" style="height: 30px;width: 80px;" ng-click="setParameterDiv(false);cancelAntiCollision();" class="btn btn-default">Cancel</button>
+                                        <button type="button" style="height: 30px;width: 80px;" class="btn btn-success" ng-click="startAntiCollisionScenario();">Start</button>
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+                            <!-- END VISITORS BLOCK -->
+
+                        </div>
+
 
                         <div class="col-md-6">
                             
@@ -105,7 +187,7 @@
                                             </thead>
                                             <tbody data-ng-repeat="car in api_getSetup">
                                                 <tr data-ng-repeat="val in car.vehicles">
-                                                    <td><strong>{{val.uuid}} - {{car.uuid}}</strong></td>
+                                                    <td><strong>{{val.address}} - {{car.uuid}}</strong></td>
                                                     <td><strong>{{val.name}}</strong></td>
                                                     <td><span ng-class="val.connected ? 'label label-success' : 'label label-danger'">{{val.connected ? 'Connected' : 'Disconnected'}}</span></td>
                                                     <td><button type="button" ng-click="sendConnectionRequest('/rest/setup/'+car.ean+'/vehicle/'+val.uuid+'/',val.connected);sendWebSocketMessage(car.uuid,val.uuid,'connection',val.connected);" ng-class="val.connected ? 'btn btn-primary' : 'btn'">{{val.connected ? 'Disconnect' : 'Connect'}}</button></td>
@@ -143,9 +225,7 @@
                                 </div>
                                 <div class="panel-body" style="max-height: 170px; height: 170px; overflow-y:scroll; margin-bottom: 10px;">
                                 <div style="margin-bottom: 5px;" id="terminal" >
-                                >> [Tue Apr 04 2017 01:50:16 GMT+0200 (CEST)] Preparing to Start Collision ...<br>
-                                >> [Tue Apr 04 2017 01:50:16 GMT+0200 (CEST)] System is not connected!  <br>
-                       
+
                                 </div>
                                 </div>
                             </div>
@@ -222,7 +302,7 @@
 
 
 
-                            
+
                         </div>
 
 
@@ -269,6 +349,28 @@
         </div>
         <!-- END MESSAGE BOX-->
 
+        <!-- Modal -->
+        <div id="myModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Modal Header</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Some text in the modal.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
         <!-- START PRELOADS -->
         <audio id="audio-alert" src="audio/alert.mp3" preload="auto"></audio>
         <audio id="audio-fail" src="audio/fail.mp3" preload="auto"></audio>
@@ -294,11 +396,12 @@
  
 
 
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
-        <script src="https://d3js.org/d3.v4.min.js"></script>
-        <script src="https://code.highcharts.com/highcharts.js"></script>
-        <script src="https://code.highcharts.com/highcharts-more.js"></script>
-        <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
+        <script src="js/plugins/angular.min.js"></script>
+        <script src="js/plugins/d3.v4.min.js"></script>
+        <script src="js/plugins/highcharts.js"></script>
+        <script src="js/plugins/highcharts-more.js"></script>
+        <script src="js/plugins/solid-gauge.js"></script>
+
 
 
         <!-- END THIS PAGE PLUGINS-->        
@@ -309,9 +412,8 @@
         <script type="text/javascript" src="js/actions.js"></script>
         <script type="text/javascript" src="js/plugins/angular-metergauge.min.js"></script> 
         <script type="text/javascript" src="js/angular_main.js"></script>
-        <script type="text/javascript" src="js/plugins/ng-websocket/ng-websocket.js""></script>        
+        <script type="text/javascript" src="js/plugins/ng-websocket/ng-websocket.js"></script>
         <script type="text/javascript" src="js/plugins/ng-resource/angular-resource.js"></script>
-        <script src="https://d3js.org/d3.v4.min.js"></script>
         <script src="js/service/restApi.js"></script>
         
         <!-- END TEMPLATE -->
