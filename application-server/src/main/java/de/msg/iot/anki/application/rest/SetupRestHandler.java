@@ -5,6 +5,7 @@ import de.msg.iot.anki.application.entity.Vehicle;
 import de.msg.iot.anki.application.entity.VehicleCommand;
 import de.msg.iot.anki.application.kafka.ScenarioKafkaProducer;
 import de.msg.iot.anki.application.kafka.VehicleCommandKafkaProducer;
+import org.apache.log4j.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -24,6 +25,7 @@ public class SetupRestHandler {
         add("collision");
         add("anti-collision");
     }};
+    private final static Logger logger = Logger.getLogger(SetupRestHandler.class);
 
 
     private final EntityManagerFactory factory = Persistence.createEntityManagerFactory("anki");
@@ -86,6 +88,8 @@ public class SetupRestHandler {
     public Response connect(@PathParam("setupId") String setupId, @PathParam("vehicleId") String vehicleId) {
         Setup setup = manager.find(Setup.class, setupId);
 
+        System.out.println("Connect " + vehicleId + " @" + setupId);
+
         if (setup == null)
             return Response.status(404).build();
 
@@ -110,6 +114,8 @@ public class SetupRestHandler {
     @Produces(MediaType.APPLICATION_JSON)
     public Response disconnect(@PathParam("setupId") String setupId, @PathParam("vehicleId") String vehicleId) {
         Setup setup = manager.find(Setup.class, setupId);
+
+        System.out.println("Disconnect " + vehicleId + " @" + setupId);
 
         if (setup == null)
             return Response.status(404).build();

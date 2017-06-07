@@ -3,10 +3,8 @@
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
              version="2.0" xmlns="http://java.sun.com/xml/ns/persistence">
     <persistence-unit name="anki" transaction-type="RESOURCE_LOCAL">
-        <class>de.msg.iot.anki.application.entity.Setup</class>
-        <class>de.msg.iot.anki.application.entity.Track</class>
-        <class>de.msg.iot.anki.application.entity.Piece</class>
-        <class>de.msg.iot.anki.application.entity.Vehicle</class>
+        <class>de.msg.iot.anki.elasticplayground.entity.QualityEntry</class>
+        <class>de.msg.iot.anki.elasticplayground.entity.OptimalSpeed</class>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
             <property name="javax.persistence.jdbc.url"
