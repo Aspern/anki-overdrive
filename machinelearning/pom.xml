@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>anki-overdrive</artifactId>
+        <groupId>de.msg.iot.anki</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>machine-learning</artifactId>
+
+    <properties>
+        <spark.version>2.1.1</spark.version>
+        <settings.version>1.0.0</settings.version>
+        <elastic.version>5.2.2</elastic.version>
+        <mongo.version>3.4.2</mongo.version>
+        <lacomponents.version>1.0.0</lacomponents.version>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>${mongo.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>transport</artifactId>
+            <version>${elastic.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_2.11</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming_2.11</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-mllib_2.11</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.msg.iot.anki</groupId>
+            <artifactId>settings</artifactId>
+            <version>${settings.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.msg.iot.anki</groupId>
+            <artifactId>lambda-components</artifactId>
+            <version>${lacomponents.version}</version>
+        </dependency>
+    </dependencies>
+
+
+</project>
