@@ -5,6 +5,7 @@ import de.msg.iot.anki.application.entity.Vehicle;
 import de.msg.iot.anki.application.entity.VehicleCommand;
 import de.msg.iot.anki.application.kafka.ScenarioKafkaProducer;
 import de.msg.iot.anki.application.kafka.VehicleCommandKafkaProducer;
+import de.msg.iot.anki.spark.anticollision.AntiCollision;
 import org.apache.log4j.Logger;
 
 import javax.persistence.EntityManager;
@@ -21,6 +22,7 @@ public class SetupRestHandler {
 
 
     private static final ScenarioKafkaProducer scenarioProducer = new ScenarioKafkaProducer();
+    private AntiCollision antiCollision;
     private static final List<String> scenarios = new ArrayList<String>() {{
         add("collision");
         add("anti-collision");
@@ -176,7 +178,9 @@ public class SetupRestHandler {
                 scenarioProducer.startCollision();
                 return Response.ok().build();
             case "anti-collision":
-                scenarioProducer.startAntiCollision();
+                antiCollision = new AntiCollision();
+                antiCollision.start();
+                //scenarioProducer.startAntiCollision();
                 return Response.ok().build();
             default:
                 return Response.status(404).build();
@@ -197,7 +201,9 @@ public class SetupRestHandler {
                 scenarioProducer.stopCollision();
                 return Response.ok().build();
             case "anti-collision":
-                scenarioProducer.stopAntiCollision();
+                //scenarioProducer.stopAntiCollision();
+                antiCollision.stop();
+                antiCollision = null;
                 return Response.ok().build();
             default:
                 return Response.status(404).build();

@@ -12,6 +12,7 @@
         <module>elasticplayground</module>
         <module>machinelearning</module>
         <module>lambdacomponents</module>
+        <module>spark</module>
     </modules>
     <packaging>pom</packaging>
 
