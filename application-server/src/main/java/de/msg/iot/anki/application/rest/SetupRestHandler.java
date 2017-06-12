@@ -168,10 +168,10 @@ public class SetupRestHandler {
     @Path("/{setupId}/scenario/{name}/start")
     @Produces(MediaType.APPLICATION_JSON)
     public Response startScenario(@PathParam("setupId") String setupId, @PathParam("name") String name) {
-        //Setup setup = manager.find(Setup.class, setupId);
+        Setup setup = manager.find(Setup.class, setupId);
 
-        //if (setup == null || !scenarios.contains(name))
-        //    return Response.status(404).build();
+        if (setup == null || !scenarios.contains(name))
+            return Response.status(404).build();
 
         switch (name) {
             case "collision":
