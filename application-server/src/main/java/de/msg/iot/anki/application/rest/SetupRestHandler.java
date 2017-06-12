@@ -164,14 +164,14 @@ public class SetupRestHandler {
         return Response.ok(scenarios).build();
     }
 
-    @POST
+    @GET
     @Path("/{setupId}/scenario/{name}/start")
     @Produces(MediaType.APPLICATION_JSON)
     public Response startScenario(@PathParam("setupId") String setupId, @PathParam("name") String name) {
-        Setup setup = manager.find(Setup.class, setupId);
+        //Setup setup = manager.find(Setup.class, setupId);
 
-        if (setup == null || !scenarios.contains(name))
-            return Response.status(404).build();
+        //if (setup == null || !scenarios.contains(name))
+        //    return Response.status(404).build();
 
         switch (name) {
             case "collision":
@@ -187,7 +187,7 @@ public class SetupRestHandler {
         }
     }
 
-    @POST
+    @GET
     @Path("/{setupId}/scenario/{name}/interrupt")
     @Produces(MediaType.APPLICATION_JSON)
     public Response interruptScenario(@PathParam("setupId") String setupId, @PathParam("name") String name) {

@@ -98,6 +98,20 @@ public class AntiCollision {
         producer.sendMessage(response, getCarIdFromJson(message));
     }
 
+    private static void setSpeed(String carId, int speed) {
+        System.out.println("SETTING UP SPEED");
+        String response = "{" +
+                "\"name\" : \"set-speed\", " +
+                "\"params\" : [" +
+                speed +   //speed
+                "," +
+                "250" +     //acceleration
+                "]" +
+                "}";
+        producer.sendMessage(response);
+        producer.sendMessage(response, carId);
+    }
+
     private static void brake(String message) {
         String response = "{" +
                 "\"name\" : \"brake\", " +
@@ -166,6 +180,8 @@ public class AntiCollision {
 
     public void start(){
 
+        System.out.println("Starting the anti collision");
+
         Settings settings = new PropertiesSettings("settings.properties");
 
         producer = new KafkaProducer(settings, "test");
@@ -226,6 +242,8 @@ public class AntiCollision {
                 StorageLevel.MEMORY_AND_DISK()
         );
 
+        setSpeed(RED_VEHICLE_ID, 400);
+        setSpeed(BLUE_VEHICLE_ID, 400);
 
         /*
         * Get only the value from stream and meanwhile save message in the mysql aswell
