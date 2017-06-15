@@ -164,7 +164,7 @@ public class SetupRestHandler {
         return Response.ok(scenarios).build();
     }
 
-    @POST
+    @GET
     @Path("/{setupId}/scenario/{name}/start")
     @Produces(MediaType.APPLICATION_JSON)
     public Response startScenario(@PathParam("setupId") String setupId, @PathParam("name") String name) {
@@ -187,7 +187,7 @@ public class SetupRestHandler {
         }
     }
 
-    @POST
+    @GET
     @Path("/{setupId}/scenario/{name}/interrupt")
     @Produces(MediaType.APPLICATION_JSON)
     public Response interruptScenario(@PathParam("setupId") String setupId, @PathParam("name") String name) {
