@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('app', ['meterGauge','PostService','ngWebsocket','ngResource']);
+var app = angular.module('app', ['meterGauge','PostService','ngWebsocket','ngResource','filters.stringUtils']);
 
 app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websocket,$http,$resource){
 
@@ -34,7 +34,6 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
     $scope.setParameterDiv = function(val){
 
         $scope.parameter_div = val;
-        console.log("this function is called");
     };
 
     $scope.getParameterDiv = function(){
@@ -56,8 +55,9 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
     {
         var action = $checkbox ? 'start' : 'interrupt';
 
-        if(($index == 0 && $checkbox == false) || ($index == 1 && $checkbox == false) || ($index == 0 && $checkbox == true) ) // if the scenario is only collision
+        if(($index == 0 && $checkbox == false) || ($index == 1 && $checkbox == false) || ($index == 0 && $checkbox == true) ) // if the scenario is collision and anti-collision is false
         {
+            console.log("stop anti collision");
             for(var i=0; i<$scope.api_getSetup.length;i++) //for all kits
             {
                 $scope.sendReq(scenarioURL+'/'+$scope.api_getSetup[i].ean+'/scenario/'+$scope.scenarioArray[$index]+'/'+action);
@@ -76,9 +76,19 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
     $scope.startAntiCollisionScenario = function()
     {
 
+        var speed_gs = angular.element('#GroundShock').val();
+        var speed_sk =  angular.element('#Skull').val();
+        var lane_no = angular.element('#lane_anticollision').val();
+        var break_s = angular.element('#range_break_anticollision').val();
+        var accel = angular.element('#range_acceleration_anticollision').val();
+        var distance =  angular.element('#range_distance_anticollision').val();
+
         for(var i=0; i<$scope.api_getSetup.length;i++) //for all kits
         {
-            $scope.sendReq(scenarioURL+'/'+$scope.api_getSetup[i].ean+'/scenario/'+$scope.scenarioArray[1]+'/'+'start');
+            $scope.sendReq(scenarioURL+'/'+$scope.api_getSetup[i].ean+'/scenario/'+$scope.scenarioArray[1]+'/'+'start?speed_GS='+speed_gs+"&"+'speed_SK='+speed_sk+"&"+'lane='+lane_no+"&"+'break='+break_s+"&"+'accel='+accel+"&"+'distance='+distance);
+            console.log(scenarioURL+'/'+$scope.api_getSetup[i].ean+'/scenario/'+$scope.scenarioArray[1]+'/'+'start?speed_GS='+speed_gs+"&"+'speed_SK='+speed_sk+"&"+'lane='+lane_no+"&"+'break='+break_s+"&"+'accel='+accel+"&"+'distance='+distance);
+            console.log("this function is called");
+
         }
         $scope.updateTerminalStatus("Anti collision", true);
 
