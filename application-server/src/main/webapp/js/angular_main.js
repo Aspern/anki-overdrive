@@ -87,8 +87,6 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
         {
             $scope.sendReq(scenarioURL+'/'+$scope.api_getSetup[i].ean+'/scenario/'+$scope.scenarioArray[1]+'/'+'start?speed_GS='+speed_gs+"&"+'speed_SK='+speed_sk+"&"+'lane='+lane_no+"&"+'break='+break_s+"&"+'accel='+accel+"&"+'distance='+distance);
             console.log(scenarioURL+'/'+$scope.api_getSetup[i].ean+'/scenario/'+$scope.scenarioArray[1]+'/'+'start?speed_GS='+speed_gs+"&"+'speed_SK='+speed_sk+"&"+'lane='+lane_no+"&"+'break='+break_s+"&"+'accel='+accel+"&"+'distance='+distance);
-            console.log("this function is called");
-
         }
         $scope.updateTerminalStatus("Anti collision", true);
 
