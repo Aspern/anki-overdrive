@@ -178,9 +178,9 @@ public class SetupRestHandler {
                 scenarioProducer.startCollision();
                 return Response.ok().build();
             case "anti-collision":
-                antiCollision = new AntiCollision();
-                antiCollision.start();
-                //scenarioProducer.startAntiCollision();
+                //antiCollision = new AntiCollision();
+                //antiCollision.start();
+                scenarioProducer.startAntiCollision();
                 return Response.ok().build();
             default:
                 return Response.status(404).build();
@@ -201,9 +201,9 @@ public class SetupRestHandler {
                 scenarioProducer.stopCollision();
                 return Response.ok().build();
             case "anti-collision":
-                //scenarioProducer.stopAntiCollision();
-                antiCollision.stop();
-                antiCollision = null;
+                scenarioProducer.stopAntiCollision();
+                //antiCollision.stop();
+                //antiCollision = null;
                 return Response.ok().build();
             default:
                 return Response.status(404).build();

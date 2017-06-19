@@ -97,26 +97,28 @@
 
                         <div data-ng-repeat="car in api_getSetup">
 
-                        <div class="form-group" data-ng-repeat="val in car.vehicles" style="margin-top: 20px !important;">
+                        <div class="form-group" data-ng-repeat="val in car.vehicles">
                             <label class="col-md-4 control-label">{{val.name}} [mm/s]</label>
                             <div class="col-md-4">
-                                <input type="number" id="{{val.name}}" step="1" max="1500" class="form-control" placeholder="0-1500"/>
-                                <br>
+                                <input type="number" id="{{val.name | removeSpaces }}" step="1" max="1500" class="form-control" placeholder="0-1500"/>
+
+
                             </div>
+                            <br>
                             <br>
                         </div>
 
 
                         </div>
                         <br>
-                        <div class="form-group" style="margin-top: 10px;">
+                        <div class="form-group" style="margin-top: 0px;">
                             <label class="col-md-4 control-label">Lane Number</label>
                             <div class="col-md-4">
-                                <select class="form-control select">
-                                    <option>Lane 1</option>
-                                    <option>Lane 2</option>
-                                    <option>Lane 3</option>
-                                    <option>Lane 4</option>
+                                <select class="form-control select" id="lane_anticollision">
+                                    <option value="1">Lane 1</option>
+                                    <option value="2">Lane 2</option>
+                                    <option value="3">Lane 3</option>
+                                    <option value="4">Lane 4</option>
                                 </select>
                             </div>
                         </div><br>
@@ -140,7 +142,7 @@
 
                         <div class="form-group" align="right">
                             <button type="button" style="height: 30px;width: 80px;" ng-click="setParameterDiv(false);cancelAntiCollision();" class="btn btn-default">Cancel</button>
-                            <button type="button" style="height: 30px;width: 80px;" class="btn btn-success" ng-click="startAntiCollisionScenario();">Start</button>
+                            <button type="button" style="height: 30px;width: 80px;" class="btn btn-success" ng-click="startAntiCollisionScenario();setParameterDiv(false);">Start</button>
                         </div>
 
 
@@ -405,6 +407,7 @@
 <script type="text/javascript" src="js/plugins/ng-websocket/ng-websocket.js"></script>
 <script type="text/javascript" src="js/plugins/ng-resource/angular-resource.js"></script>
 <script src="js/service/restApi.js"></script>
+<script src="js/service/removeSpaces.js"></script>
 
 <!-- END TEMPLATE -->
 <!-- END SCRIPTS -->
