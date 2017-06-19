@@ -5,6 +5,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import static org.junit.Assert.assertEquals;
 
 public class PropertiesSettingsTest {
@@ -30,6 +32,14 @@ public class PropertiesSettingsTest {
         PropertiesSettingsImpl settings = new PropertiesSettingsImpl("sample-properties-settings.properties");
         assertEquals(settings.get("key"), "value");
         assertEquals(settings.getAsInt("int", 0), new Integer(42));
+    }
+
+    @Test
+    public void set() throws Exception {
+        PropertiesSettingsImpl settings = new PropertiesSettingsImpl("sample-properties-settings.properties");
+        String randomValue = String.valueOf(ThreadLocalRandom.current().nextInt());
+        settings.set("random", randomValue);
+        assertEquals(settings.get("random"), randomValue);
     }
 
 }

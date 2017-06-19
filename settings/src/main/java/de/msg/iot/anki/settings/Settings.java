@@ -4,6 +4,8 @@ public interface Settings {
 
     String get(String key);
 
+    void set(String key, String value);
+
     default String get(String key, String defaultValue) {
         String value = get(key);
         if(value == null)
@@ -61,5 +63,7 @@ public interface Settings {
             return defaultValue;
         return Boolean.valueOf(value);
     }
+
+
 
 }

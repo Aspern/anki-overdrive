@@ -13,6 +13,7 @@
         <module>machinelearning</module>
         <module>lambdacomponents</module>
         <module>spark</module>
+        <module>core</module>
     </modules>
     <packaging>pom</packaging>
 

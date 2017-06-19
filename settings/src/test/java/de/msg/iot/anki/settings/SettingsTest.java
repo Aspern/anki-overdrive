@@ -35,6 +35,11 @@ public class SettingsTest {
         public String get(String key) {
             return this.settings.get(key);
         }
+
+        @Override
+        public void set(String key, String value) {
+            this.settings.put(key, value);
+        }
     }
 
     @Rule
@@ -49,6 +54,12 @@ public class SettingsTest {
     public void get() throws Exception {
         assertEquals(settings.get("key"), "value");
         assertEquals(settings.get("no-key"), null);
+    }
+
+    @Test
+    public void set() throws Exception {
+        settings.set("hello", "world");
+        assertEquals(settings.get("hello"), "world");
     }
 
     @Test

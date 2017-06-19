@@ -26,6 +26,7 @@ public class SetupRestHandler {
     private static final List<String> scenarios = new ArrayList<String>() {{
         add("collision");
         add("anti-collision");
+        add("product-improvement");
     }};
     private final static Logger logger = Logger.getLogger(SetupRestHandler.class);
 
@@ -164,7 +165,7 @@ public class SetupRestHandler {
         return Response.ok(scenarios).build();
     }
 
-    @GET
+    @POST
     @Path("/{setupId}/scenario/{name}/start")
     @Produces(MediaType.APPLICATION_JSON)
     public Response startScenario(@PathParam("setupId") String setupId, @PathParam("name") String name) {
@@ -187,7 +188,7 @@ public class SetupRestHandler {
         }
     }
 
-    @GET
+    @POST
     @Path("/{setupId}/scenario/{name}/interrupt")
     @Produces(MediaType.APPLICATION_JSON)
     public Response interruptScenario(@PathParam("setupId") String setupId, @PathParam("name") String name) {

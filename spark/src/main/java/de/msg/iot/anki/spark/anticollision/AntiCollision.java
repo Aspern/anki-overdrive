@@ -214,7 +214,7 @@ public class AntiCollision {
 
         // Initialize the checkpoint for spark
         //jssc.checkpoint(settings.get("kafka.checkpoint"));
-        jssc.checkpoint("/home/msg/Documents/tmp");
+        jssc.checkpoint("/home/aweber/tmp");
 
         // Kafka receiver properties
         Map<String, String> kafkaParams = new HashMap<>();
