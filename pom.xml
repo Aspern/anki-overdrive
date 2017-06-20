@@ -34,6 +34,13 @@
     <dependencies>
 
         <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka_2.11</artifactId>
+            <version>0.10.1.1</version>
+        </dependency>
+
+
+        <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_2.11</artifactId>
             <version>2.0.0</version>
@@ -59,6 +66,7 @@
             <artifactId>spark-streaming-kafka-0-8_2.11</artifactId>
             <version>2.0.0</version>
         </dependency>
+
 
 
         <dependency>

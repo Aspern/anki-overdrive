@@ -18,8 +18,12 @@ import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka.KafkaUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.io.PrintWriter;
+import java.io.*;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,8 +32,8 @@ import java.util.Map;
  */
 public class AntiCollision {
 
-    public static String RED_VEHICLE_ID = "d5255cd93a2b";
-    public static String BLUE_VEHICLE_ID = "ef4ace474907";
+    //public static String RED_VEHICLE_ID = "d5255cd93a2b";
+    //public static String BLUE_VEHICLE_ID = "ef4ace474907";
 
     /*
     * Spark Context variable
@@ -44,6 +48,9 @@ public class AntiCollision {
     static int batteryLevel = 0;
     static  Boolean is34 = false;
     static PrintWriter pw;
+    static Map<String, String> kafkaParams;
+    static Map<String,Integer> topicMap;
+    static Boolean isStop = true;
 
     public static void handleAntiCollision(String message){
 
@@ -178,7 +185,28 @@ public class AntiCollision {
         return result.equals("null") ? null : Float.parseFloat(result);
     }
 
-    public void start(){
+    private static String readAll(Reader rd) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int cp;
+        while ((cp = rd.read()) != -1) {
+            sb.append((char) cp);
+        }
+        return sb.toString();
+    }
+
+    public static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
+        InputStream is = new URL(url).openStream();
+        try {
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            String jsonText = readAll(rd);
+            JSONObject json = new JSONObject(jsonText);
+            return json;
+        } finally {
+            is.close();
+        }
+    }
+
+    public AntiCollision(){
 
         System.out.println("Starting the anti collision");
 
@@ -186,38 +214,28 @@ public class AntiCollision {
 
         producer = new KafkaProducer(settings, "test");
 
+        /*
         store = new HashMap<String, Integer>() {{
             put(BLUE_VEHICLE_ID, 400); //blue car inner lane @beginning
             put(RED_VEHICLE_ID, 600); //red car outer lane @beginning
         }};
+        */
+        store = new HashMap<String, Integer>();
 
         String topic = settings.get("kafka.topic");
 
-        // Batch duration for the streaming window
-        int batchDuration = 800; //TODO: Changed batch window
-
-
-        // Define the configuration for spark context
-        sparkConf = new SparkConf().setAppName("AnkiLambda").setMaster("local[*]");
-
-        // Initialize the spark context
-        sc = new JavaSparkContext(sparkConf);
-        sc.setLogLevel("ERROR");
-
-        // This context is for receiving real-time stream
-        jssc = new JavaStreamingContext(sc, Durations.milliseconds(batchDuration)); //TODO: changed unit.
 
         // This context is used tto save messages to mysql db
-        sqlContext = new SQLContext(sc);
+        //sqlContext = new SQLContext(sc);
 
         Logger.getLogger("all").setLevel(Level.OFF);
 
         // Initialize the checkpoint for spark
         //jssc.checkpoint(settings.get("kafka.checkpoint"));
-        jssc.checkpoint("/home/msg/Documents/tmp");
+
 
         // Kafka receiver properties
-        Map<String, String> kafkaParams = new HashMap<>();
+        kafkaParams = new HashMap<>();
         kafkaParams.put("zookeeper.connect", settings.get("zookeeper.url"));
         kafkaParams.put("group.id", settings.get("kafka.group.id"));
         kafkaParams.put("auto.offset.reset", "largest");
@@ -225,13 +243,41 @@ public class AntiCollision {
         //Set<String> topicsSet = new HashSet<>(Arrays.asList(topics.split(",")));
 
         // Add topic to the Hashmap. We can add multiple topics here
-        Map<String,Integer> topicMap=new HashMap<>();
+        topicMap=new HashMap<>();
         topicMap.put(topic,1);
+
+
+    }
+
+    public void start(){
+
+
+
+        // Define the configuration for spark context
+        sparkConf = new SparkConf().setAppName("AnkiLambda").setMaster("local[*]");
+
+        // Initialize the spark context
+        if(sc == null) {
+            sc = new JavaSparkContext(sparkConf);
+            sc.setLogLevel("ERROR");
+        }
+
+        // This context is for receiving real-time stream
+
+        // Batch duration for the streaming window
+        int batchDuration = 800; //TODO: Changed batch window
+
+
+        if(jssc == null)
+            jssc = new JavaStreamingContext(sc, Durations.milliseconds(batchDuration)); //TODO: changed unit.
+
+        jssc.checkpoint("/home/msg/Documents/tmp");
+
 
         /*
         * Create kafka stream to receive messages
         * */
-        JavaPairReceiverInputDStream<String, String> kafkaStream=KafkaUtils.createStream(
+        JavaPairReceiverInputDStream<String, String> kafkaStream= KafkaUtils.createStream(
                 jssc,
                 String.class,
                 String.class,
@@ -241,9 +287,6 @@ public class AntiCollision {
                 topicMap,
                 StorageLevel.MEMORY_AND_DISK()
         );
-
-        setSpeed(RED_VEHICLE_ID, 400);
-        setSpeed(BLUE_VEHICLE_ID, 400);
 
         /*
         * Get only the value from stream and meanwhile save message in the mysql aswell
@@ -255,6 +298,10 @@ public class AntiCollision {
         */
         JavaDStream<String> speedMessagesStream = str.filter(a -> {
             Integer messageId = getMessageIdFromJson(a);
+            String carId = getCarIdFromJson(a);
+            if(!store.containsKey(carId))
+                store.put(carId, 400);
+
             if(messageId != null && messageId == 39){
                 return Boolean.TRUE;
             }
@@ -286,22 +333,34 @@ public class AntiCollision {
 
         antiCollision.print();
 
+
+
         // Start the computation
-        jssc.start();
+        if(isStop) {
+            jssc.start();
+            isStop = false;
+        }
 
         // Don't stop the execution until user explicitly stops or we can pass the duration for the execution
+        /*
         try {
             jssc.awaitTermination();
-            producer.close();
+            //producer.close();
 
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        */
     }
 
     public void stop(){
+        System.out.println("stop called");
         jssc.stop();
-        producer.close();
+        //producer.close();
+        isStop = true;
+        sparkConf = null;
+        sc = null;
+        jssc = null;
     }
 
     public void startAnticollision(){
