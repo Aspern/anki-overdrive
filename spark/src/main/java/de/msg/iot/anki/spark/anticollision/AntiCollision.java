@@ -136,8 +136,8 @@ public class AntiCollision {
 
         JsonElement jelement = new JsonParser().parse(json);
         JsonObject jobject = jelement.getAsJsonObject();
-        if(!jobject.has("_messageId")) return null;
-        int messageId = Integer.parseInt(jobject.get("_messageId").toString());
+        if(!jobject.has("messageId")) return null;
+        int messageId = Integer.parseInt(jobject.get("messageId").toString());
         return messageId;
     }
 
@@ -145,7 +145,7 @@ public class AntiCollision {
 
         JsonElement jelement = new JsonParser().parse(json);
         JsonObject jobject = jelement.getAsJsonObject();
-        String speed = jobject.get("_speed").toString();
+        String speed = jobject.get("speed").toString();
         return Float.parseFloat(speed);
     }
 
@@ -161,7 +161,7 @@ public class AntiCollision {
 
         JsonElement jelement = new JsonParser().parse(json);
         JsonObject jobject = jelement.getAsJsonObject();
-        String piece = jobject.get("_piece").toString();
+        String piece = jobject.get("piece").toString();
         return Integer.parseInt(piece);
     }
 
@@ -302,6 +302,15 @@ public class AntiCollision {
     public void stop(){
         jssc.stop();
         producer.close();
+    }
+
+    public void startAnticollision(){
+        producer.sendMessage("start-anticollision", "kafka-spark-anticollision");
+
+    }
+
+    public void stopAnticollision(){
+        producer.sendMessage("stop-anticollision", "kafka-spark-anticollision");
     }
 }
 
