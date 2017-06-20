@@ -38,7 +38,8 @@ public class SetupRestHandler {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response list() {
-        @SuppressWarnings("unchecked") List<Setup> list = manager.createQuery("select d from Setup d")
+        @SuppressWarnings("unchecked")
+        List<Setup> list = manager.createQuery("select d from Setup d")
                 .getResultList();
 
         return Response.ok(list).build();
@@ -201,9 +202,9 @@ public class SetupRestHandler {
                 scenarioProducer.stopCollision();
                 return Response.ok().build();
             case "anti-collision":
-                //scenarioProducer.stopAntiCollision();
-                    System.out.println("calling stop");
-                        antiCollision.stop();
+                scenarioProducer.stopAntiCollision();
+                System.out.println("calling stop");
+                antiCollision.stop();
                 return Response.ok().build();
             default:
                 return Response.status(404).build();

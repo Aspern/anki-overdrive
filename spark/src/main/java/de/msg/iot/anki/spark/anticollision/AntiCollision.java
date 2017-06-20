@@ -20,6 +20,7 @@ import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka.KafkaUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import scala.reflect.macros.contexts.Infrastructure$class;
 
 import java.io.*;
 import java.net.URL;
@@ -271,7 +272,7 @@ public class AntiCollision {
         if(jssc == null)
             jssc = new JavaStreamingContext(sc, Durations.milliseconds(batchDuration)); //TODO: changed unit.
 
-        jssc.checkpoint("/home/msg/Documents/tmp");
+        jssc.checkpoint("/home/aweber/tmp");
 
 
         /*
