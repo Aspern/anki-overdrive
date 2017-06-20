@@ -20,7 +20,6 @@ import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka.KafkaUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
-import scala.reflect.macros.contexts.Infrastructure$class;
 
 import java.io.*;
 import java.net.URL;
@@ -52,6 +51,7 @@ public class AntiCollision {
     static Map<String, String> kafkaParams;
     static Map<String,Integer> topicMap;
     static Boolean isStop = true;
+    static String checkpointDirectory;
 
     public static void handleAntiCollision(String message){
 
@@ -247,6 +247,8 @@ public class AntiCollision {
         topicMap=new HashMap<>();
         topicMap.put(topic,1);
 
+        checkpointDirectory = settings.get("spark.checkpoint.directory");
+
 
     }
 
@@ -272,7 +274,7 @@ public class AntiCollision {
         if(jssc == null)
             jssc = new JavaStreamingContext(sc, Durations.milliseconds(batchDuration)); //TODO: changed unit.
 
-        jssc.checkpoint("/home/aweber/tmp");
+        jssc.checkpoint(checkpointDirectory);
 
 
         /*
