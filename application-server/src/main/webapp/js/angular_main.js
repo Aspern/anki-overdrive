@@ -15,11 +15,14 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
     $scope.date = new Date();
     var vehiclesInSetup = [];
     var myEl = angular.element( document.querySelector( '#terminal' ) );
-    $scope.scenarioArray = ["collision","anti-collision"];
+    $scope.scenarioArray = ["collision","anti-collision","product improvement"];
     $scope.battery_level = [];
     $scope.disable = {};
     $scope.parameter_div = false;
-
+    $scope.quality_parameter_div = false;
+    $scope.boolean_btn_start_quality = false;
+    $scope.boolean_btn_improve_quality = false;
+    var cb_index,cb; //checkbox
 
 
     /* REST API URLS */
@@ -43,7 +46,25 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
 
     $scope.cancelAntiCollision = function()
     {
-        $scope.scenarioStatus['anti-collision'] = false;
+        $scope.scenarioStatus[$scope.scenarioArray[1]] = false;
+
+    };
+
+    $scope.setQualityParameterDiv = function(val){
+
+        $scope.quality_parameter_div = val;
+    };
+
+    $scope.getQualityParameterDiv = function(){
+
+        return $scope.quality_parameter_div;
+    };
+
+    $scope.cancelQualityScenario = function()
+    {
+        $scope.scenarioStatus[$scope.scenarioArray[2]] = false;
+        $scope.boolean_btn_start_quality = false;
+        $scope.boolean_btn_improve_quality = false;
 
     };
 
@@ -53,9 +74,12 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
 
     $scope.checkBoxClicked = function($checkbox,$index)
     {
+        cb_index = $index;
+        cb = $checkbox;
+
         var action = $checkbox ? 'start' : 'interrupt';
 
-        if(($index == 0 && $checkbox == false) || ($index == 1 && $checkbox == false) || ($index == 0 && $checkbox == true) ) // if the scenario is collision and anti-collision is false
+        if(($index == 0 && $checkbox == false)  || ($index == 0 && $checkbox == true) || ($index == 1 && $checkbox == false) || ($index == 2 && $checkbox == false) ) // if the scenario is collision and anti-collision is false
         {
             console.log("stop anti collision");
             for(var i=0; i<$scope.api_getSetup.length;i++) //for all kits
@@ -71,11 +95,16 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
         else if($index == 1 && $checkbox==true)
             $scope.setParameterDiv(true);
 
+        else if($index == 2 && $checkbox==false)
+            $scope.setQualityParameterDiv(false);
+        else if($index == 2 && $checkbox==true)
+            $scope.setQualityParameterDiv(true);
+
+
     };
 
     $scope.startAntiCollisionScenario = function()
     {
-
         var speed_gs = angular.element('#GroundShock').val();
         var speed_sk =  angular.element('#Skull').val();
         var lane_no = angular.element('#lane_anticollision').val();
@@ -88,12 +117,36 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
             $scope.sendReq(scenarioURL+'/'+$scope.api_getSetup[i].ean+'/scenario/'+$scope.scenarioArray[1]+'/'+'start?speed_GS='+speed_gs+"&"+'speed_SK='+speed_sk+"&"+'lane='+lane_no+"&"+'break='+break_s+"&"+'accel='+accel+"&"+'distance='+distance);
             console.log(scenarioURL+'/'+$scope.api_getSetup[i].ean+'/scenario/'+$scope.scenarioArray[1]+'/'+'start?speed_GS='+speed_gs+"&"+'speed_SK='+speed_sk+"&"+'lane='+lane_no+"&"+'break='+break_s+"&"+'accel='+accel+"&"+'distance='+distance);
         }
-        $scope.updateTerminalStatus("Anti collision", true);
+        $scope.updateTerminalStatus($scope.scenarioArray[1], true);
 
 
     };
 
+    $scope.startQualityScenario = function($improve)
+    {
+
+        var quality =  angular.element('#quality_qualityscenario').val();
+
+        for(var i=0; i<$scope.api_getSetup.length;i++) //for all kits
+        {
+            $scope.sendReq(scenarioURL+'/'+$scope.api_getSetup[i].ean+'/scenario/'+$scope.scenarioArray[1]+'/'+'start?quality='+quality+"&"+'improve='+$improve);
+        }
+
+        if(!$improve)
+            $scope.updateTerminalStatus($scope.scenarioArray[2], true);
+
+        if($improve)
+            $scope.boolean_btn_improve_quality = true;
+        else
+            $scope.boolean_btn_start_quality = true;
+
+
+    };
+
+
     /* Scenario ends here */
+
+
 
 
     /* Terminal starts here*/
@@ -107,7 +160,7 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
 
         var statusnew = $status ? "Preparing to start" : "Stopping";
 
-        myEl.append('>> ['+$scope.date+'] '+ statusnew +' '+ $scenarioName +'... '+'<br>');
+        myEl.append('>> ['+$scope.date+'] '+ statusnew +' '+ $scenarioName + '... '+'<br>');
 
     };
 
@@ -151,25 +204,25 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
         {
             var x  = angular.toJson(data);
             $scope.api_getSetup = angular.fromJson(x);
+
+            for(var i=0;i<$scope.api_getSetup.length;i++)
+            {
+
+                var scenarioData = $resource('/rest/setup'+'/'+$scope.api_getSetup[i].ean+'/scenario');
+                scenarioData.query(function(data){
+
+                    var x  = angular.toJson(data);
+                    $scope.scenarioArray = angular.fromJson(x);
+
+
+                });
+
+            }
+
             $scope.createSpeedoMeter(); // creating speedometer again
 
 
         });
-
-
-        for(var i=0;i<$scope.api_getSetup.length;i++)
-        {
-
-            var scenarioData = $resource('/rest/setup'+'/'+$scope.api_getSetup[i].ean+'/scenario');
-            scenarioData.query(function(data){
-
-                var x  = angular.toJson(data);
-                $scope.scenarioArray = angular.fromJson(x);
-
-
-            });
-
-        }
 
 
     };

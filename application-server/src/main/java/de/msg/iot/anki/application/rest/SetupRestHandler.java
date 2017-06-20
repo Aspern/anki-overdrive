@@ -22,7 +22,7 @@ public class SetupRestHandler {
 
 
     private static final ScenarioKafkaProducer scenarioProducer = new ScenarioKafkaProducer();
-    private AntiCollision antiCollision;
+    private static AntiCollision antiCollision = new AntiCollision();
     private static final List<String> scenarios = new ArrayList<String>() {{
         add("collision");
         add("anti-collision");
@@ -169,19 +169,18 @@ public class SetupRestHandler {
     @Path("/{setupId}/scenario/{name}/start")
     @Produces(MediaType.APPLICATION_JSON)
     public Response startScenario(@PathParam("setupId") String setupId, @PathParam("name") String name) {
-        //Setup setup = manager.find(Setup.class, setupId);
+        Setup setup = manager.find(Setup.class, setupId);
 
-        //if (setup == null || !scenarios.contains(name))
-          //  return Response.status(404).build();
+        if (setup == null || !scenarios.contains(name))
+            return Response.status(404).build();
 
         switch (name) {
             case "collision":
                 scenarioProducer.startCollision();
                 return Response.ok().build();
             case "anti-collision":
-                //antiCollision = new AntiCollision();
-                //antiCollision.start();
-                scenarioProducer.startAntiCollision();
+                antiCollision.start();
+                //scenarioProducer.startAntiCollision();
                 return Response.ok().build();
             default:
                 return Response.status(404).build();
@@ -202,9 +201,9 @@ public class SetupRestHandler {
                 scenarioProducer.stopCollision();
                 return Response.ok().build();
             case "anti-collision":
-                scenarioProducer.stopAntiCollision();
-                //antiCollision.stop();
-                //antiCollision = null;
+                //scenarioProducer.stopAntiCollision();
+                    System.out.println("calling stop");
+                        antiCollision.stop();
                 return Response.ok().build();
             default:
                 return Response.status(404).build();

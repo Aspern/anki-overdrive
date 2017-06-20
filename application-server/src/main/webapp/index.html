@@ -69,6 +69,9 @@
         </div>
         <!-- END WIDGETS -->
 
+        <!-- Anti Collision Paramters -->
+
+
         <div class="row">
 
             <div class="col-md-6" ng-show="parameter_div">
@@ -149,12 +152,62 @@
 
                     </div>
                 </div>
-                <!-- END VISITORS BLOCK -->
+                <!-- END Anit collision parameters BLOCK -->
 
             </div>
 
 
-            <div class="col-md-6">
+            <!-- Quality Paramters -->
+
+
+            <div class="row">
+
+                <div class="col-md-6" ng-show="quality_parameter_div">
+
+                    <!-- START VISITORS BLOCK -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="panel-title-box">
+                                <h3>Parameters</h3>
+                                <span>For Quality Scenario</span>
+                            </div>
+                            <ul class="panel-controls" style="margin-top: 2px;">
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fa fa-cog"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#" class="panel-collapse"><span class="fa fa-angle-down"></span> Collapse</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="panel-body" >
+                            <div style="margin-top: 20px;">
+
+                                <label class="col-md-4 control-label">Product Quality</label><div align="center"><input type="range" min="0" max="100" id="quality_qualityscenario" value="85" step="1" onchange="range_quality_qualityscenario.value=this.value" style="width: 65%;text-align: center;" /></div>
+
+                                <div align="center"><output id="range_quality_qualityscenario">85</output></div>
+
+                            </div>
+
+
+                            <div class="form-group" align="right">
+                                <br>
+                                <button type="button" style="height: 30px;width: 80px;" ng-click="setQualityParameterDiv(false);cancelQualityScenario();" class="btn btn-default">Cancel</button>
+                                <button type="button" style="height: 30px;width: 80px;" class="btn btn-success" ng-click="startQualityScenario(false);" ng-disabled="boolean_btn_start_quality">Start</button>
+                                <button type="button" style="height: 30px;width: 80px; background-color: #0464ab !important;color: white;" class="btn" ng-click="startQualityScenario(true);" ng-disabled="boolean_btn_improve_quality">Improve</button>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                    <!-- END Quality parameters BLOCK -->
+
+                </div>
+
+
+
+                <div class="col-md-6">
 
                 <!-- START PROJECTS BLOCK -->
                 <div class="panel panel-default">
