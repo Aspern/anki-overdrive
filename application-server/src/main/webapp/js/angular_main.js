@@ -305,7 +305,6 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
 
             if(value >= 0 || value <= 170)
                 $timeout($scope.speedometer[vehicleID.substring(1)].needleVal = value, 10);
-            console.log($scope.speedometer[vehicleID.substring(1)]);
 
             ws[websocket_setupid].$emit('webgui',new_json);
 
@@ -378,7 +377,6 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
                 if(message.command === "enable-listener")
                 {
                     $scope.speedometer[message.vehicleId].needleVal = message.payload.speed;
-                    //console.log(message.payload);
 
                 }
                 else if(message.command == "query-battery-level")
@@ -488,8 +486,6 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
         $scope.battery_level[elementID] = Math.round(val*100)+"%";
 
 
-
-        console.log("updatebattery function"+$scope.battery_level[elementID]);
         $scope.$apply();
 
 
