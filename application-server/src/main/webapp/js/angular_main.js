@@ -23,6 +23,14 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
     $scope.boolean_btn_start_quality = false;
     $scope.boolean_btn_improve_quality = false;
 
+    //Anti collision paramters variables
+    $scope.parameter_ac_distance = 500;
+    $scope.parameter_ac_speed_skull = 400;
+    $scope.parameter_ac_speed_groundS = 500;
+    $scope.parameter_ac_breakstrength = 300;
+    $scope.parameter_ac_acceleration = 50;
+
+
 
     /* REST API URLS */
 
@@ -78,7 +86,6 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
 
         if(($index == 0 && $checkbox == false)  || ($index == 0 && $checkbox == true) || ($index == 1 && $checkbox == false) || ($index == 2 && $checkbox == false) ) // if the scenario is collision and anti-collision is false
         {
-            console.log("stop anti collision");
             for(var i=0; i<$scope.api_getSetup.length;i++) //for all kits
             {
                 $scope.sendReq(scenarioURL+'/'+$scope.api_getSetup[i].ean+'/scenario/'+$scope.scenarioArray[$index]+'/'+action);
@@ -118,7 +125,6 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
         for(var i=0; i<$scope.api_getSetup.length;i++) //for all kits
         {
             $scope.sendReq(scenarioURL+'/'+$scope.api_getSetup[i].ean+'/scenario/'+$scope.scenarioArray[1]+'/'+'start?speed_GS='+speed_gs+"&"+'speed_SK='+speed_sk+"&"+'lane='+lane_no+"&"+'break='+break_s+"&"+'accel='+accel+"&"+'distance='+distance);
-            console.log(scenarioURL+'/'+$scope.api_getSetup[i].ean+'/scenario/'+$scope.scenarioArray[1]+'/'+'start?speed_GS='+speed_gs+"&"+'speed_SK='+speed_sk+"&"+'lane='+lane_no+"&"+'break='+break_s+"&"+'accel='+accel+"&"+'distance='+distance);
         }
         $scope.updateTerminalStatus($scope.scenarioArray[1], true);
 

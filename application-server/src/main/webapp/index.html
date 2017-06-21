@@ -93,9 +93,9 @@
                         </ul>
                     </div>
                     <div class="panel-body" >
-                        <label class="col-md-4 control-label">Distance</label><div align="center"><input type="range" min="100" max="1500" id="distance_anticollision" value="500" step="10" onchange="range_distance_anticollision.value=this.value" style="width: 65%;text-align: center;" /></div>
+                        <label class="col-md-4 control-label">Distance</label><div align="center"><input type="range" min="100" max="1500" id="distance_anticollision" value="{{parameter_ac_distance}}" step="10" onchange="range_distance_anticollision.value=this.value" style="width: 65%;text-align: center;" /></div>
 
-                        <div align="center"><output id="range_distance_anticollision">0</output></div>
+                        <div align="center"><output id="range_distance_anticollision">{{parameter_ac_distance}}</output></div>
 
 
                         <div data-ng-repeat="car in api_getSetup">
@@ -103,9 +103,7 @@
                         <div class="form-group" data-ng-repeat="val in car.vehicles">
                             <label class="col-md-4 control-label">{{val.name}} [mm/s]</label>
                             <div class="col-md-4">
-                                <input type="number" id="{{val.name | removeSpaces }}" step="1" max="1500" class="form-control" placeholder="0-1500"/>
-
-
+                                <input type="number" id="{{val.name | removeSpaces }}" step="1" max="1500" value="{{val.name=='Skull' && ''+parameter_ac_speed_skull || ''+parameter_ac_speed_groundS }}" class="form-control" placeholder="0-1500"/>
                             </div>
                             <br>
                             <br>
@@ -117,28 +115,28 @@
                         <div class="form-group" style="margin-top: 0px;">
                             <label class="col-md-4 control-label">Lane Number</label>
                             <div class="col-md-4">
-                                <select class="form-control select" id="lane_anticollision" value="4">
+                                <select class="form-control select" id="lane_anticollision">
                                     <option value="1">Lane 1</option>
                                     <option value="2">Lane 2</option>
                                     <option value="3">Lane 3</option>
-                                    <option value="4">Lane 4</option>
+                                    <option value="4" selected>Lane 4</option>
                                 </select>
                             </div>
                         </div><br>
 
                         <div style="margin-top: 30px;">
 
-                            <label class="col-md-4 control-label">Acceleration Brake</label><div align="center"><input type="range" min="50" max="1500" id="break_anticollision" value="300" step="50" onchange="range_break_anticollision.value=this.value" style="width: 65%;text-align: center;" /></div>
+                            <label class="col-md-4 control-label">Acceleration Brake</label><div align="center"><input type="range" min="50" max="1500" id="break_anticollision" value="{{parameter_ac_breakstrength}}" step="50" onchange="range_break_anticollision.value=this.value" style="width: 65%;text-align: center;" /></div>
 
-                            <div align="center"><output id="range_break_anticollision">0</output></div>
+                            <div align="center"><output id="range_break_anticollision">{{parameter_ac_breakstrength}}</output></div>
 
                         </div>
 
                         <div style="margin-top: 20px;">
 
-                            <label class="col-md-4 control-label">Acceleration Speed-Up</label><div align="center"><input type="range" min="50" max="1500" id="acceleration_anticollision" value="50" step="50" onchange="range_acceleration_anticollision.value=this.value" style="width: 65%;text-align: center;" /></div>
+                            <label class="col-md-4 control-label">Acceleration Speed-Up</label><div align="center"><input type="range" min="50" max="1500" id="acceleration_anticollision" value="{{parameter_ac_acceleration}}" step="50" onchange="range_acceleration_anticollision.value=this.value" style="width: 65%;text-align: center;" /></div>
 
-                            <div align="center"><output id="range_acceleration_anticollision">0</output></div>
+                            <div align="center"><output id="range_acceleration_anticollision">{{parameter_ac_acceleration}}</output></div>
 
                         </div>
 
