@@ -195,6 +195,9 @@ public class SetupRestHandler {
                         accelerationSpeedUp,
                         accelerationBrake
                 );
+            case "product-improvement":
+                scenarioProducer.startProductImprovement();
+                return Response.ok().build();
             default:
                 return Response.status(404).build();
         }
@@ -271,6 +274,9 @@ public class SetupRestHandler {
                 scenarioProducer.stopAntiCollision();
                 System.out.println("calling stop");
                 antiCollision.stop();
+                return Response.ok().build();
+            case "product-improvement":
+                scenarioProducer.stopProductImprovment();
                 return Response.ok().build();
             default:
                 return Response.status(404).build();

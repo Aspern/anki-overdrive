@@ -282,7 +282,7 @@ public class AntiCollision {
         // This context is for receiving real-time stream
 
         // Batch duration for the streaming window
-        int batchDuration = 25; //TODO: Changed batch window
+        int batchDuration = 100; //TODO: Changed batch window
 
 
         if(jssc == null)

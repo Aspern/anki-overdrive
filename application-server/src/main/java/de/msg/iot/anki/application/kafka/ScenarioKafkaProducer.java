@@ -36,4 +36,18 @@ public class ScenarioKafkaProducer extends AbstractKafkaProducer<Scenario> {
                 true
         ));
     }
+
+    public void startProductImprovement() {
+        this.sendMessage(new Scenario(
+                "product-improvement",
+                false
+        ));
+    }
+
+    public void stopProductImprovment() {
+        this.sendMessage(new Scenario(
+                "product-improvement",
+                true
+        ));
+    }
 }
