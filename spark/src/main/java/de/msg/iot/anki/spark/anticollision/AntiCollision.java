@@ -53,13 +53,10 @@ public class AntiCollision {
     static Map<String, Object> kafkaParams;
     static List<String> topicMap;
     static Boolean isStop = true;
-<<<<<<< HEAD
     static double brakeStrength = 0.15;
     static double accStrength = 0.08;
     static double horizontalDistance = 500;
-=======
     static String checkpointDirectory;
->>>>>>> d326dee0e11f23107d6e6ff4fcdc8a585020cf93
 
     public static void handleAntiCollision(String message){
 
@@ -318,10 +315,6 @@ public class AntiCollision {
         */
         JavaDStream<String> speedMessagesStream = str.filter(a -> {
             Integer messageId = getMessageIdFromJson(a);
-            String carId = getCarIdFromJson(a);
-            if(!store.containsKey(carId))
-                store.put(carId, 400);
-
             if(messageId != null && messageId == 39){
                 return Boolean.TRUE;
             }
