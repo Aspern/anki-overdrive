@@ -7,25 +7,27 @@ import com.google.gson.JsonParser;
 import de.msg.iot.anki.settings.Settings;
 import de.msg.iot.anki.settings.properties.PropertiesSettings;
 import de.msg.iot.anki.spark.kafka.KafkaProducer;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SQLContext;
-import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaDStream;
-import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
+import org.apache.spark.streaming.api.java.JavaInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
-import org.apache.spark.streaming.kafka.KafkaUtils;
+import org.apache.spark.streaming.kafka010.ConsumerStrategies;
+import org.apache.spark.streaming.kafka010.KafkaUtils;
+import org.apache.spark.streaming.kafka010.LocationStrategies;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by msg on 17.03.17.
@@ -48,8 +50,8 @@ public class AntiCollision {
     static int batteryLevel = 0;
     static  Boolean is34 = false;
     static PrintWriter pw;
-    static Map<String, String> kafkaParams;
-    static Map<String,Integer> topicMap;
+    static Map<String, Object> kafkaParams;
+    static List<String> topicMap;
     static Boolean isStop = true;
     static String checkpointDirectory;
 
@@ -237,15 +239,19 @@ public class AntiCollision {
 
         // Kafka receiver properties
         kafkaParams = new HashMap<>();
-        kafkaParams.put("zookeeper.connect", settings.get("zookeeper.url"));
-        kafkaParams.put("group.id", settings.get("kafka.group.id"));
-        kafkaParams.put("auto.offset.reset", "largest");
+        kafkaParams.put("bootstrap.servers", settings.get("kafka.server"));
+        kafkaParams.put("key.deserializer", StringDeserializer.class);
+        kafkaParams.put("value.deserializer", StringDeserializer.class);
+        kafkaParams.put("group.id", UUID.randomUUID().toString());
+        kafkaParams.put("auto.offset.reset", "latest");
+        kafkaParams.put("enable.auto.commit", settings.getAsBoolean("kafka.autocommit", false));
+
 
         //Set<String> topicsSet = new HashSet<>(Arrays.asList(topics.split(",")));
 
         // Add topic to the Hashmap. We can add multiple topics here
-        topicMap=new HashMap<>();
-        topicMap.put(topic,1);
+        topicMap=new ArrayList<>();
+        topicMap.add(topic);
 
         checkpointDirectory = settings.get("spark.checkpoint.directory");
 
@@ -268,33 +274,33 @@ public class AntiCollision {
         // This context is for receiving real-time stream
 
         // Batch duration for the streaming window
-        int batchDuration = 800; //TODO: Changed batch window
+        int batchDuration = 25; //TODO: Changed batch window
 
 
         if(jssc == null)
             jssc = new JavaStreamingContext(sc, Durations.milliseconds(batchDuration)); //TODO: changed unit.
 
         jssc.checkpoint(checkpointDirectory);
-
+        jssc.sparkContext().setLogLevel("OFF");
 
         /*
         * Create kafka stream to receive messages
         * */
-        JavaPairReceiverInputDStream<String, String> kafkaStream= KafkaUtils.createStream(
+        final JavaInputDStream<ConsumerRecord<String, String>> kafkaStream = KafkaUtils.createDirectStream(
                 jssc,
-                String.class,
-                String.class,
-                kafka.serializer.StringDecoder.class,
-                kafka.serializer.StringDecoder.class,
-                kafkaParams,
-                topicMap,
-                StorageLevel.MEMORY_AND_DISK()
+                LocationStrategies.PreferConsistent(),
+                ConsumerStrategies.<String, String>Subscribe(
+                        topicMap,
+                        kafkaParams
+                )
         );
+
+
 
         /*
         * Get only the value from stream and meanwhile save message in the mysql aswell
         * */
-        JavaDStream<String> str = kafkaStream.map(a -> a._2().toString());
+        JavaDStream<String> str = kafkaStream.map(a -> a.value());
 
         /*
         * Filter out the messages which contains the distances

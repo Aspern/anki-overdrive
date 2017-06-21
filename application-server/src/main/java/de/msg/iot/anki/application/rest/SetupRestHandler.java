@@ -180,12 +180,40 @@ public class SetupRestHandler {
                 scenarioProducer.startCollision();
                 return Response.ok().build();
             case "anti-collision":
-                antiCollision.start();
-                //scenarioProducer.startAntiCollision();
-                return Response.ok().build();
+                return startAntiCollisionScenario(setup);
             default:
                 return Response.status(404).build();
         }
+    }
+
+    private Response startAntiCollisionScenario(Setup setup) {
+        if (setup.getVehicles().size() < 2)
+            return Response.status(500)
+                    .entity("Cannot start anti-collision scenario with less then 2 vehicles.")
+                    .build();
+
+        try {
+            Vehicle vehicle1 = setup.getVehicles().get(0);
+            Vehicle vehicle2 = setup.getVehicles().get(1);
+            VehicleCommandKafkaProducer producer1 = new VehicleCommandKafkaProducer(vehicle1.getUuid());
+            VehicleCommandKafkaProducer producer2 = new VehicleCommandKafkaProducer(vehicle2.getUuid());
+
+            producer1.sendMessage(new VehicleCommand("set-speed", 400));
+            Thread.sleep(1000);
+            producer2.sendMessage(new VehicleCommand("set-speed", 400));
+            Thread.sleep(2000);
+            producer1.sendMessage(new VehicleCommand("change-lane", 68.0));
+            producer2.sendMessage(new VehicleCommand("change-lane", 68.0));
+            Thread.sleep(1500);
+            antiCollision.start();
+            return Response.ok().build();
+
+        } catch (Exception exception) {
+            return Response.status(500)
+                    .entity(exception)
+                    .build();
+        }
+
     }
 
     @POST

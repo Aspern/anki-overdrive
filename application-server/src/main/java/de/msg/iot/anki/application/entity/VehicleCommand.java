@@ -4,13 +4,13 @@ package de.msg.iot.anki.application.entity;
 public class VehicleCommand {
 
     private String name;
-    private int[] params;
+    private Number[] params;
 
     public VehicleCommand(String name) {
         this.name = name;
     }
 
-    public VehicleCommand(String name, int... params) {
+    public VehicleCommand(String name, Number... params) {
         this(name);
         this.params = params;
     }
@@ -23,11 +23,11 @@ public class VehicleCommand {
         this.name = name;
     }
 
-    public int[] getParams() {
+    public Number[] getParams() {
         return params;
     }
 
-    public void setParams(int[] params) {
+    public void setParams(Number[] params) {
         this.params = params;
     }
 }
