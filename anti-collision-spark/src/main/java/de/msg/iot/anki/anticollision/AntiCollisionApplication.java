@@ -139,7 +139,7 @@ public class AntiCollisionApplication implements LifeCycleComponent {
                                     message.getVehicleId(),
                                     0,
                                     UUID.randomUUID().toString(),
-                                    "{\"name\":\")\",\"params\":["+ lastDesiredSpeeds.get(message.getVehicleId()) + ",50],\"timestamp\":" + message.getTimestamp().getTime() + "}"
+                                    "{\"name\":\")\",\"params\":[" + lastDesiredSpeeds.get(message.getVehicleId()) + ",50],\"timestamp\":" + message.getTimestamp().getTime() + "}"
 //                                    serializer.toJson(
 //                                            new VehicleCommand("accelerate", message.getTimestamp(), lastDesiredSpeeds.get(message.getVehicleId()), 50)
 //                                    )

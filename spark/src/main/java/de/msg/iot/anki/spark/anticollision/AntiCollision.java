@@ -53,8 +53,8 @@ public class AntiCollision {
     static Map<String, Object> kafkaParams;
     static List<String> topicMap;
     static Boolean isStop = true;
-    static double brakeStrength = 0.15;
-    static double accStrength = 0.08;
+    static int accelerationBrake = 300;
+    static int acceleartionSpeedUp = 50;
     static double horizontalDistance = 500;
     static String checkpointDirectory;
 
@@ -91,7 +91,7 @@ public class AntiCollision {
                 "\"name\" : \"accelerate\", " +
                 "\"params\" : [" +
                 store.get(carId)+ ", " +   //speed //TODO: using static speed for accel.
-                AntiCollision.accStrength +     //acceleration
+                AntiCollision.acceleartionSpeedUp +     //acceleration
                 "]" +
                 "}";
         producer.sendMessage(response);
@@ -129,7 +129,7 @@ public class AntiCollision {
         String response = "{" +
                 "\"name\" : \"brake\", " +
                 "\"params\" : [" +
-                AntiCollision.brakeStrength +
+                AntiCollision.accelerationBrake +
                 "]" +
                 "}";
         producer.sendMessage(response);
@@ -261,11 +261,11 @@ public class AntiCollision {
 
     }
 
-    public void setParameters(float distance, HashMap<String, Integer> cars, double brakeStrength, double accelerationStrength){
+    public void setParameters(float distance, Map<String, Integer> cars, int brakeStrength, int accelerationStrength){
         AntiCollision.horizontalDistance = distance;
         AntiCollision.store = cars;
-        AntiCollision.brakeStrength = brakeStrength;
-        AntiCollision.accStrength = accelerationStrength;
+        AntiCollision.accelerationBrake = brakeStrength;
+        AntiCollision.acceleartionSpeedUp = accelerationStrength;
     }
 
     public void start(){

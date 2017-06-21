@@ -6,7 +6,9 @@ import de.msg.iot.anki.application.entity.VehicleCommand;
 import de.msg.iot.anki.application.kafka.ScenarioKafkaProducer;
 import de.msg.iot.anki.application.kafka.VehicleCommandKafkaProducer;
 import de.msg.iot.anki.spark.anticollision.AntiCollision;
+import org.apache.hadoop.util.hash.Hash;
 import org.apache.log4j.Logger;
+import scala.Int;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -17,6 +19,7 @@ import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Path("/setup")
 public class SetupRestHandler {
@@ -29,9 +32,6 @@ public class SetupRestHandler {
         add("anti-collision");
         add("product-improvement");
     }};
-    private final static Logger logger = Logger.getLogger(SetupRestHandler.class);
-
-
     private final EntityManagerFactory factory = Persistence.createEntityManagerFactory("anki");
     private final EntityManager manager = factory.createEntityManager();
 
@@ -170,8 +170,14 @@ public class SetupRestHandler {
     @POST
     @Path("/{setupId}/scenario/{name}/start")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response startScenario(@PathParam("setupId") String setupId, @PathParam("name") String name) {
+    public Response startScenario(@PathParam("setupId") String setupId, @PathParam("name") String name,
+                                  @QueryParam("speed_GS") int speedGroundShock, @QueryParam("speed_SK") int speedSkull,
+                                  @QueryParam("lane") int lane, @QueryParam("break") int accelerationBrake,
+                                  @QueryParam("accel") int accelerationSpeedUp, @QueryParam("distance") int distance,
+                                  @QueryParam("quality") int quality, @QueryParam("improve") boolean improve) {
+
         Setup setup = manager.find(Setup.class, setupId);
+
 
         if (setup == null || !scenarios.contains(name))
             return Response.status(404).build();
@@ -181,15 +187,21 @@ public class SetupRestHandler {
                 scenarioProducer.startCollision();
                 return Response.ok().build();
             case "anti-collision":
-                // In order to set params in Anti Collision class, use this method
-                //antiCollision.setParameters(500, vehicles, 0.15, 0.08);
-                return startAntiCollisionScenario(setup);
+                return startAntiCollisionScenario(
+                        setup,
+                        speedGroundShock,
+                        speedSkull,
+                        distance,
+                        accelerationSpeedUp,
+                        accelerationBrake
+                );
             default:
                 return Response.status(404).build();
         }
     }
 
-    private Response startAntiCollisionScenario(Setup setup) {
+    private Response startAntiCollisionScenario(Setup setup, int speedGroundShock, int speedSkull,
+                                                int distance, int accelerationSpeedUp, int accelerationBrake) {
         if (setup.getVehicles().size() < 2)
             return Response.status(500)
                     .entity("Cannot start anti-collision scenario with less then 2 vehicles.")
@@ -208,6 +220,29 @@ public class SetupRestHandler {
             producer1.sendMessage(new VehicleCommand("change-lane", 68.0));
             producer2.sendMessage(new VehicleCommand("change-lane", 68.0));
             Thread.sleep(1500);
+
+            String idGroundShock = null;
+            String idSkull = null;
+
+            if (vehicle1.getName().equals("Ground Shock")) {
+                idGroundShock = vehicle1.getUuid();
+                idSkull = vehicle2.getUuid();
+            } else {
+                idGroundShock = vehicle2.getUuid();
+                idSkull = vehicle1.getUuid();
+            }
+
+            final Map<String, Integer> store = new HashMap<>();
+            store.put(idGroundShock, speedGroundShock);
+            store.put(idSkull, speedSkull);
+
+            antiCollision.setParameters(
+                    distance,
+                    store,
+                    accelerationBrake,
+                    accelerationSpeedUp
+            );
+
             antiCollision.start();
             return Response.ok().build();
 
