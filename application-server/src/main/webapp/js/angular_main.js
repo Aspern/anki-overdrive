@@ -15,14 +15,13 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
     $scope.date = new Date();
     var vehiclesInSetup = [];
     var myEl = angular.element( document.querySelector( '#terminal' ) );
-    $scope.scenarioArray = ["collision","anti-collision","product improvement"];
+    $scope.scenarioArray = ["collision","anti-collision","product-improvement"];
     $scope.battery_level = [];
     $scope.disable = {};
     $scope.parameter_div = false;
     $scope.quality_parameter_div = false;
     $scope.boolean_btn_start_quality = false;
     $scope.boolean_btn_improve_quality = false;
-    var cb_index,cb; //checkbox
 
 
     /* REST API URLS */
@@ -74,8 +73,6 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
 
     $scope.checkBoxClicked = function($checkbox,$index)
     {
-        cb_index = $index;
-        cb = $checkbox;
 
         var action = $checkbox ? 'start' : 'interrupt';
 
@@ -96,9 +93,15 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
             $scope.setParameterDiv(true);
 
         else if($index == 2 && $checkbox==false)
+        {
             $scope.setQualityParameterDiv(false);
+            $scope.boolean_btn_start_quality = false;
+            $scope.boolean_btn_start_quality = false;
+
+        }
         else if($index == 2 && $checkbox==true)
             $scope.setQualityParameterDiv(true);
+
 
 
     };
@@ -129,7 +132,7 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
 
         for(var i=0; i<$scope.api_getSetup.length;i++) //for all kits
         {
-            $scope.sendReq(scenarioURL+'/'+$scope.api_getSetup[i].ean+'/scenario/'+$scope.scenarioArray[1]+'/'+'start?quality='+quality+"&"+'improve='+$improve);
+            $scope.sendReq(scenarioURL+'/'+$scope.api_getSetup[i].ean+'/scenario/'+$scope.scenarioArray[2]+'/'+'start?quality='+quality+"&"+'improve='+$improve);
         }
 
         if(!$improve)
