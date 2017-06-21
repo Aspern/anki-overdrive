@@ -1,4 +1,4 @@
-package de.msg.iot.anki.ml.track;
+package de.msg.iot.anki.core.track;
 
 public class Finish extends Piece {
 

@@ -1,9 +1,11 @@
-package de.msg.iot.anki.ml.track;
+package de.msg.iot.anki.track;
 
+import de.msg.iot.anki.core.track.Finish;
+import de.msg.iot.anki.core.track.Piece;
+import de.msg.iot.anki.core.track.Start;
+import de.msg.iot.anki.core.track.Track;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
 

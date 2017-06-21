@@ -27,6 +27,7 @@ public class SetupRestHandler {
     private static final List<String> scenarios = new ArrayList<String>() {{
         add("collision");
         add("anti-collision");
+        add("product-improvement");
     }};
     private final static Logger logger = Logger.getLogger(SetupRestHandler.class);
 
@@ -38,7 +39,8 @@ public class SetupRestHandler {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response list() {
-        @SuppressWarnings("unchecked") List<Setup> list = manager.createQuery("select d from Setup d")
+        @SuppressWarnings("unchecked")
+        List<Setup> list = manager.createQuery("select d from Setup d")
                 .getResultList();
 
         return Response.ok(list).build();
@@ -179,17 +181,42 @@ public class SetupRestHandler {
                 scenarioProducer.startCollision();
                 return Response.ok().build();
             case "anti-collision":
-                HashMap<String,Integer> vehicles = new HashMap<String, Integer>();
-                for (Vehicle v : setup.getVehicles()){
-                    vehicles.put(Long.toString(v.getId()), 400);
-                }
+                // In order to set params in Anti Collision class, use this method
                 //antiCollision.setParameters(500, vehicles, 0.15, 0.08);
-                antiCollision.start();
-                //scenarioProducer.startAntiCollision();
-                return Response.ok().build();
+                return startAntiCollisionScenario(setup);
             default:
                 return Response.status(404).build();
         }
+    }
+
+    private Response startAntiCollisionScenario(Setup setup) {
+        if (setup.getVehicles().size() < 2)
+            return Response.status(500)
+                    .entity("Cannot start anti-collision scenario with less then 2 vehicles.")
+                    .build();
+
+        try {
+            Vehicle vehicle1 = setup.getVehicles().get(0);
+            Vehicle vehicle2 = setup.getVehicles().get(1);
+            VehicleCommandKafkaProducer producer1 = new VehicleCommandKafkaProducer(vehicle1.getUuid());
+            VehicleCommandKafkaProducer producer2 = new VehicleCommandKafkaProducer(vehicle2.getUuid());
+
+            producer1.sendMessage(new VehicleCommand("set-speed", 400));
+            Thread.sleep(1000);
+            producer2.sendMessage(new VehicleCommand("set-speed", 400));
+            Thread.sleep(2000);
+            producer1.sendMessage(new VehicleCommand("change-lane", 68.0));
+            producer2.sendMessage(new VehicleCommand("change-lane", 68.0));
+            Thread.sleep(1500);
+            antiCollision.start();
+            return Response.ok().build();
+
+        } catch (Exception exception) {
+            return Response.status(500)
+                    .entity(exception)
+                    .build();
+        }
+
     }
 
     @POST
@@ -206,9 +233,9 @@ public class SetupRestHandler {
                 scenarioProducer.stopCollision();
                 return Response.ok().build();
             case "anti-collision":
-                //scenarioProducer.stopAntiCollision();
-                    System.out.println("calling stop");
-                        antiCollision.stop();
+                scenarioProducer.stopAntiCollision();
+                System.out.println("calling stop");
+                antiCollision.stop();
                 return Response.ok().build();
             default:
                 return Response.status(404).build();

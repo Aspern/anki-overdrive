@@ -1,5 +1,8 @@
-package de.msg.iot.anki.ml.track;
+package de.msg.iot.anki.track;
 
+import de.msg.iot.anki.core.track.Curve;
+import de.msg.iot.anki.core.track.Piece;
+import de.msg.iot.anki.core.track.Straight;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

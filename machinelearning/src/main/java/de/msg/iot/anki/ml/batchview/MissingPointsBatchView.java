@@ -6,10 +6,6 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.mongodb.client.MongoDatabase;
 import de.msg.iot.anki.ml.MachineLearningModule;
-import de.msg.iot.anki.ml.track.Finish;
-import de.msg.iot.anki.ml.track.Piece;
-import de.msg.iot.anki.ml.track.Start;
-import de.msg.iot.anki.ml.track.Track;
 import de.msg.iot.anki.settings.Settings;
 import de.msg.iot.la.batchview.mongo.IncrementalMongoBatchView;
 import org.apache.log4j.Logger;
@@ -27,6 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class MissingPointsBatchView extends IncrementalMongoBatchView {
 
@@ -37,16 +34,7 @@ public class MissingPointsBatchView extends IncrementalMongoBatchView {
     private int lane = -1;
     private AtomicInteger k = new AtomicInteger(0);
     private List<Document> cache = new ArrayList<>();
-    private final Track track = Track.builder()
-            .addStraight(1)
-            .addCurve(1)
-            .addCurve(2)
-            .addStraight(2)
-            .addStraight(2)
-            .addCurve(2)
-            .addCurve(2)
-            .build();
-    private Piece current = track.getStart();
+
 
     @Inject
     public MissingPointsBatchView(Settings settings, Client client, MongoDatabase db) {
@@ -63,7 +51,7 @@ public class MissingPointsBatchView extends IncrementalMongoBatchView {
         Collection<Document> increment = new ArrayList<>();
 
         QueryBuilder query = QueryBuilders.boolQuery()
-                .must(QueryBuilders.termQuery("messageId", 39))
+                .must(QueryBuilders.termQuery("messageId", -119))
                 .must(QueryBuilders.rangeQuery("timestamp")
                         .gte(timestamp)
                         .lte("now")
@@ -77,105 +65,32 @@ public class MissingPointsBatchView extends IncrementalMongoBatchView {
                 .get();
 
         List<SearchHit> hits = Arrays.asList(scroll.getHits().getHits());
-        hits = filterFirstRecords(hits);
 
         do {
-            increment.addAll(addMissingPoints(hits));
+            increment.addAll(extractPositionData(hits));
 
             scroll = elastic.prepareSearchScroll(scroll.getScrollId())
                     .setScroll(new TimeValue(60000))
                     .execute()
                     .actionGet();
-            hits = Arrays.asList(scroll.getHits().getHits());
 
-            if (scroll.getHits().getHits().length < 100)
-                hits = filterLastRecords(hits);
 
         } while (scroll.getHits().getHits().length != 0);
 
         return increment;
     }
 
-    private List<Document> addMissingPoints(List<SearchHit> hits) {
-        List<Document> increment = new ArrayList<>();
-
-        if (hits.isEmpty())
-            return increment;
-
-        if (lane < 0)
-            lane = (int) hits.get(0).getSource().get("lane");
-
-        for (int i = 0; i < hits.size(); i++) {
-            SearchHit hit = hits.get(i);
-
-            do {
-                final Map<String, Object> source = hit.getSource();
-                final int piece = current.getId();
-                final int location = current.getLanes()[lane][k.get()];
-                k.incrementAndGet();
-
-                if ((int) source.get("piece") == piece
-                        && (int) source.get("location") == location) {
-                    cache.add(createEntry(source));
-                    if (i + 1 < hits.size()) {
-                        i++;
-                        hit = hits.get(i);
-                    }
-                } else {
-                    cache.add(createMissingEntry(source, piece, location));
-                }
-
-                if (current.getLanes()[lane].length <= k.get()) {
-                    k.set(0);
-                    current = current.getNext();
-                }
-
-            } while (current != track.getStart());
-        }
-
-        return increment;
+    private List<Document> extractPositionData(List<SearchHit> hits) {
+//        return hits.stream()
+//                .map(hit -> hit.getSource())
+//                .flatMap(source -> ((List<Map<String, Object>>)source.get("labeledPositions")))
+//                .map(labeledPosition -> {
+//                    Document document = new Document();
+//                    document.put("lastDesiredSpeed", labeledPosition.);
+//                }).collect(Collectors.toList());
+        return null;
     }
 
-    private Document createEntry(Map<String, Object> hit) {
-        Document document = new Document();
-        document.put("piece", hit.get("piece"));
-        document.put("location", hit.get("location"));
-        document.put("lastDesiredSpeed", hit.get("lastDesiredSpeed"));
-        document.put("timestamp", hit.get("timestamp"));
-        document.put("missing", false);
-        return document;
-    }
-
-    private Document createMissingEntry(Map<String, Object> hit, int piece, int location) {
-        Document document = new Document();
-        document.put("piece", piece);
-        document.put("location", location);
-        document.put("lastDesiredSpeed", hit.get("lastDesiredSpeed"));
-        document.put("timestamp", hit.get("timestamp"));
-        document.put("missing", true);
-        return document;
-    }
-
-    private List<SearchHit> filterFirstRecords(List<SearchHit> hits) {
-        int index = 0;
-        for (; index < hits.size(); index++)
-            if ((int) hits.get(index).getSource().get("piece") == Start.START_ID)
-                break;
-
-        return hits.subList(index, hits.size() - 1);
-    }
-
-    private List<SearchHit> filterLastRecords(List<SearchHit> hits) {
-        int index = hits.size() - 1;
-        for (; index >= 0; index--)
-            if ((int) hits.get(index).getSource().get("piece") == Finish.FINISH_ID)
-                break;
-
-        if (index < 0)
-            index = 0;
-
-        return hits.subList(0, index);
-    }
 
     @Override
     protected void handleException(Exception e) {

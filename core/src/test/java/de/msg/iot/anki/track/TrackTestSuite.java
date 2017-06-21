@@ -1,4 +1,4 @@
-package de.msg.iot.anki.ml.track;
+package de.msg.iot.anki.track;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
