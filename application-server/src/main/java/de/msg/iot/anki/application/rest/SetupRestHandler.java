@@ -15,6 +15,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Path("/setup")
@@ -178,6 +179,11 @@ public class SetupRestHandler {
                 scenarioProducer.startCollision();
                 return Response.ok().build();
             case "anti-collision":
+                HashMap<String,Integer> vehicles = new HashMap<String, Integer>();
+                for (Vehicle v : setup.getVehicles()){
+                    vehicles.put(Long.toString(v.getId()), 400);
+                }
+                //antiCollision.setParameters(500, vehicles, 0.15, 0.08);
                 antiCollision.start();
                 //scenarioProducer.startAntiCollision();
                 return Response.ok().build();

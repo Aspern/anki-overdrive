@@ -51,13 +51,16 @@ public class AntiCollision {
     static Map<String, String> kafkaParams;
     static Map<String,Integer> topicMap;
     static Boolean isStop = true;
+    static double brakeStrength = 0.15;
+    static double accStrength = 0.08;
+    static double horizontalDistance = 500;
 
     public static void handleAntiCollision(String message){
 
         Float distance = getDistanceFromJson(message, "horizontal");  //get Horizontal distance
-        if (distance <= 500)
+        if (distance <= AntiCollision.horizontalDistance)
             brake(message);
-        else if (distance > 700)
+        else if (distance > AntiCollision.horizontalDistance * 1.4)
             speedUp(message);
         //TODO: removed hold speed case because it was only to set light.
     }
@@ -85,7 +88,7 @@ public class AntiCollision {
                 "\"name\" : \"accelerate\", " +
                 "\"params\" : [" +
                 store.get(carId)+ ", " +   //speed //TODO: using static speed for accel.
-                "0.08" +     //acceleration
+                AntiCollision.accStrength +     //acceleration
                 "]" +
                 "}";
         producer.sendMessage(response);
@@ -123,7 +126,7 @@ public class AntiCollision {
         String response = "{" +
                 "\"name\" : \"brake\", " +
                 "\"params\" : [" +
-                "0.15" +
+                AntiCollision.brakeStrength +
                 "]" +
                 "}";
         producer.sendMessage(response);
@@ -249,9 +252,14 @@ public class AntiCollision {
 
     }
 
+    public void setParameters(float distance, HashMap<String, Integer> cars, double brakeStrength, double accelerationStrength){
+        AntiCollision.horizontalDistance = distance;
+        AntiCollision.store = cars;
+        AntiCollision.brakeStrength = brakeStrength;
+        AntiCollision.accStrength = accelerationStrength;
+    }
+
     public void start(){
-
-
 
         // Define the configuration for spark context
         sparkConf = new SparkConf().setAppName("AnkiLambda").setMaster("local[*]");
