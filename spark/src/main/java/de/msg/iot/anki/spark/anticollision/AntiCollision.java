@@ -57,6 +57,7 @@ public class AntiCollision {
     static int acceleartionSpeedUp = 50;
     static double horizontalDistance = 500;
     static String checkpointDirectory;
+    static int batchDuration = 100;
 
     public static void handleAntiCollision(String message){
 
@@ -261,11 +262,12 @@ public class AntiCollision {
 
     }
 
-    public void setParameters(float distance, Map<String, Integer> cars, int brakeStrength, int accelerationStrength){
+    public void setParameters(float distance, Map<String, Integer> cars, int brakeStrength, int accelerationStrength, int batchDuratrion){
         AntiCollision.horizontalDistance = distance;
         AntiCollision.store = cars;
         AntiCollision.accelerationBrake = brakeStrength;
         AntiCollision.acceleartionSpeedUp = accelerationStrength;
+        AntiCollision.batchDuration = batchDuratrion;
     }
 
     public void start(){
@@ -280,10 +282,6 @@ public class AntiCollision {
         }
 
         // This context is for receiving real-time stream
-
-        // Batch duration for the streaming window
-        int batchDuration = 100; //TODO: Changed batch window
-
 
         if(jssc == null)
             jssc = new JavaStreamingContext(sc, Durations.milliseconds(batchDuration)); //TODO: changed unit.

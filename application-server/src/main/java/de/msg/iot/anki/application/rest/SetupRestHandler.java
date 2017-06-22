@@ -6,9 +6,6 @@ import de.msg.iot.anki.application.entity.VehicleCommand;
 import de.msg.iot.anki.application.kafka.ScenarioKafkaProducer;
 import de.msg.iot.anki.application.kafka.VehicleCommandKafkaProducer;
 import de.msg.iot.anki.spark.anticollision.AntiCollision;
-import org.apache.hadoop.util.hash.Hash;
-import org.apache.log4j.Logger;
-import scala.Int;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -243,7 +240,8 @@ public class SetupRestHandler {
                     distance,
                     store,
                     accelerationBrake,
-                    accelerationSpeedUp
+                    accelerationSpeedUp,
+                    100
             );
 
             antiCollision.start();
