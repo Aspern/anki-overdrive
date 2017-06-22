@@ -25,19 +25,14 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
 
     //Anti collision paramters variables
     $scope.parameter_ac_distance = 500;
-    $scope.parameter_ac_speed_skull = 400;
-    $scope.parameter_ac_speed_groundS = 500;
+    $scope.parameter_ac_speed_skull = 600;
+    $scope.parameter_ac_speed_groundS = 400;
     $scope.parameter_ac_breakstrength = 300;
     $scope.parameter_ac_acceleration = 50;
 
-
-
     /* REST API URLS */
 
-//var portAddress = 'http://localhost:8080/rest';
-//var setupURL = portAddress + '/setup';
     var scenarioURL = '/rest/setup';
-
 
     /* REST API URLS ends here*/
 
@@ -75,13 +70,10 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
 
     };
 
-
     /* Scenario Starts here*/
-
 
     $scope.checkBoxClicked = function($checkbox,$index)
     {
-
         var action = $checkbox ? 'start' : 'interrupt';
 
         if(($index == 0 && $checkbox == false)  || ($index == 0 && $checkbox == true) || ($index == 1 && $checkbox == false) || ($index == 2 && $checkbox == false) ) // if the scenario is collision and anti-collision is false
@@ -108,8 +100,6 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
         }
         else if($index == 2 && $checkbox==true)
             $scope.setQualityParameterDiv(true);
-
-
 
     };
 
@@ -152,11 +142,7 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
 
     };
 
-
     /* Scenario ends here */
-
-
-
 
     /* Terminal starts here*/
     $scope.date = new Date();
@@ -177,11 +163,9 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
         $scope.date = new Date();
     };
 
-
     /* Terminal ends here*/
 
     /* POST service */
-
 
     $scope.sendReq = function (url,data) {
 
@@ -199,7 +183,6 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
     };
 
     /* POST service ends here */
-
 
     /* REST SERVICE FUNCITONS */
 
@@ -252,7 +235,6 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
 
 
     };
-
 
 
     /* REST SERVICE FUNCTIONS ends here*/
@@ -346,8 +328,6 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
 
     };
 
-
-
     /* WEBSOCKET STARTS HERE */
 
     $scope.webSocketConnection = function(setupID,vehicleID,messageType,value)
@@ -374,8 +354,6 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
                 },6000);
             }
 
-
-
         })
             .$on('$message',function (message) { // it listents for incoming 'messages'
 
@@ -394,15 +372,12 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
 
             });
 
-
     };
 
 
     /* WEBSOCKET ENDS HERE*/
 
-
     /* CARS CONTROLLER STARTS HERE */
-
 
     $scope.createSpeedoMeter = function()
     {
@@ -461,7 +436,6 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
 
         $scope.allVehicles = vehicles;
 
-
     };
 
     $scope.createSpeedoMeter(); // creating speedometer on runtime
@@ -498,6 +472,5 @@ app.controller('MyCtrl', function($scope,$interval,SendPostReq, $timeout,$websoc
     };
 
     /* CARS CONTROLLER ENDS HERE */
-
 
 });
