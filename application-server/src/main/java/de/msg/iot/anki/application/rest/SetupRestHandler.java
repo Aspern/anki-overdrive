@@ -241,7 +241,7 @@ public class SetupRestHandler {
                     store,
                     accelerationBrake,
                     accelerationSpeedUp,
-                    100
+                    25
             );
 
             antiCollision.start();

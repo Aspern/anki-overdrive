@@ -129,7 +129,7 @@ public class AntiCollision {
     private static void brake(String message) {
         String response = "{" +
                 "\"name\" : \"brake\", " +
-                "\"params\" : [" +
+                "\"params\" : [50, " +
                 AntiCollision.accelerationBrake +
                 "]" +
                 "}";
